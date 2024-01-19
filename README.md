@@ -6,7 +6,7 @@ There are other customiations to be made in the Defines_and_Docs tab, right at t
 
 There are now graphs for temperature, rain and snow.  The snow graph will not show unless there is snow in the 5-day forecast.  Rain and Temperature will always show.  The new graphs are filled in with color.  Red for temperature, blue for rain and white for snow.
 
-The display now goes off after a time period.  You can easily change it.  If either button is pressed while the display is off, a time and date screen will be shown for a few seconds, then the screen rotation will resume for the timeout period.  If either button is pressed while the display is on, it will not show the time and date screen but will reset the timeout to the maximum.  It does not add time, just resets it to max timeout.
+The display now goes off after a time period.  You can easily change it.  If either button is pressed while the display is off, a time and date screen will be shown for a few seconds, then the screen rotation will resume for the timeout period.  If either button is pressed while the display is on, it will not show the time and date screen but will reset the timeout to the maximum.  It does not add time, just resets it to max timeout.  Also, the screen will wake up on the hour just as if a button was pressed.
 
 This is still a work-in-progress but is working as coded.  Other functions, features or improvements may be made in the future until I am totally happy with it.  This is close to the end of coding for the design I have made.  If you have suggestions for additional functions or find errors, please let me know.  I accept suggestiong or bug reports without whining like some on Github do.  I am always open to improving the tool.
 
