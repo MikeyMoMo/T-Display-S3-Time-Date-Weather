@@ -20,12 +20,12 @@ String latstr = "18.5376";   // Your latitude for Bangui
 String lonstr = "120.7671";  // Your longitude for Bangui
 
 // POSIX TimeZone rule for where you are.
-//const char* time_zone = "EST5EDT,M3.2.0/2:00:00,M11.1.0/2:00:00";  // for Buffalo
+//const char* time_zone = "EST5EDT,M3.2.0/2:00:00,M11.1.0/2:00:00";  // for Buffalo (snow testing)
 //String latstr = "42.886447";   // Your latitude for Shreveport
 //String lonstr = "-78.878369";  // Your longitude for Shreveport
 
 // Get OneCall API key.
-const String api_key = "2874af657bd3f25f664000b1cbaddc66";
+const String api_key = "YOUR_OWM_API_KEY";
 //const String api_key = "Your_OWM_API_key_here";  // Get OneCall API key.
 // Note: I stay up late and sleep late!
 const int lowFetchRateStart =  2;  // 2 am, starts one data fetch per hour.
