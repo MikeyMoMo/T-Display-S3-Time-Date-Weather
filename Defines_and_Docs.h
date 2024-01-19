@@ -1,13 +1,7 @@
 // Start of user customizations ------------------
 
-//const char* ssid     = "MikeysWAP";
-//const char* password = "Noogly99";
-const char* ssid     = "LallaveWifi";
-const char* password = "Lallave@Family7";
 //const char* ssid     = "Your_SSID";
 //const char* password = "Your_PW";
-//String town = "Bangui";  // Not used.
-//String Country = "PH";   // Not used.
 
 // POSIX TimeZone rule for where you are.
 //const char* time_zone = "CST6CDT,M3.2.0/2:00:00,M11.1.0/2:00:00";  // for Shreveport
