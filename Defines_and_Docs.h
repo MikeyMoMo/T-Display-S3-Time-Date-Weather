@@ -19,7 +19,6 @@ String lonstr = "120.7671";  // Your longitude for Bangui
 //String lonstr = "-78.878369";  // Your longitude for Shreveport
 
 // Get OneCall API key.
-const String api_key = "YOUR_OWM_API_KEY";
 //const String api_key = "Your_OWM_API_key_here";  // Get OneCall API key.
 // Note: I stay up late and sleep late!
 const int lowFetchRateStart =  2;  // 2 am, starts one data fetch per hour.
