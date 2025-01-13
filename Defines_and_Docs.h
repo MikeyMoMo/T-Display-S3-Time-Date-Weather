@@ -6,11 +6,8 @@
 */
 // Start of user customizations ------------------
 
-//const char* ssid     = "MikeysWAP";
-//const char* password = "Noogly99";
-
-const char* ssid     = "Converge2G";
-const char* password = "Lallave@Family7";
+const char* ssid     = "your_ssid";
+const char* password = "your_pw";
 
 int whichCity = 0;  // Put your preferred city in 0.
 int prevCity = whichCity;
