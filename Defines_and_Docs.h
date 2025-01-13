@@ -6,11 +6,8 @@
 */
 // Start of user customizations ------------------
 
-//const char* ssid     = "MikeysWAP";
-//const char* password = "Noogly99";
-
-const char* ssid     = "Converge2G";
-const char* password = "Lallave@Family7";
+const char* ssid     = "ssid";
+const char* password = "pw";
 
 int whichCity = 0;  // Put your preferred city in 0.
 int prevCity = whichCity;
@@ -41,7 +38,7 @@ char cCharWork[200];
 time_t UTC, workTime;
 
 // Get OneCall API key.
-const String api_key = "2874af657bd3f25f664000b1cbaddc66";
+const String api_key = "YOUR_OWM_API_KEY";
 //const String api_key = "Your_OWM_API_key_here";  // Get OneCall API key.
 // Use 'M' (or anything else) for Metric or I for Imperial
 //String    Units             = "M";
