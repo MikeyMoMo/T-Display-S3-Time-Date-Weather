@@ -3,6 +3,7 @@ void fetch_and_decode_OneCall()
 /***************************************************************************/
 {
   JsonDocument doc;
+  int looper = 0;
   int thisHour = -1;
   int httpCode = -1;
 
@@ -16,7 +17,6 @@ void fetch_and_decode_OneCall()
       Serial.println(oneCallEndpoint);
       http.begin(oneCallEndpoint); //Specify the URL
       httpCode = http.GET();      //Make the request
-      looper = 0;
       if (httpCode < 0) {
         Serial.printf("Error %i on OneCall HTTP request. "
                       "Retrying in 10 seconds.\r\n", httpCode);

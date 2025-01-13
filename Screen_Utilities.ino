@@ -16,7 +16,7 @@ void getMyTime()
   strftime(timeWkDay, 4, "%a", &timeinfo); intDOW   = timeinfo.tm_wday;
   strftime(timeDOM, 4, "%d", &timeinfo);   intDOM   = timeinfo.tm_mday;
   clockString = SDays[intDOW]  + ", " + SMonths[intMonth] + " " +
-                String(intDOM) + ", " + String(intYear);
+                      String(intDOM) + ", " + String(intYear);
 
   dayInWeek   = timeinfo.tm_wday;  // Sunday = 0
   dayInMonth  = timeinfo.tm_mday;  // Day of the month (rationally starting at 1)
@@ -176,9 +176,7 @@ void ShowForecast()
 
     // The high and low temps expected for the day
     // tmpF = (current_temp * 9. / 5.) + 32.;  // Convert ºF to ºC.
-    //    if (Units == "I") {
-    if (multiCity[whichCity].units == "imperial")
-    {
+    if (Units == "I") {
       sprintf(cMinTmp, "%3i", int((daily_item_temp_min[i] * 9. / 5.) + 32.));
       sprintf(cMaxTmp, "%3i", int((daily_item_temp_max[i] * 9. / 5.) + 32.));
     } else {

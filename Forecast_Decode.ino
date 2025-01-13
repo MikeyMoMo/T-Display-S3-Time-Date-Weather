@@ -3,6 +3,7 @@ void fetch_and_decode_Forecast()
 /***************************************************************************/
 {
   JsonDocument doc;
+  int looper = 0;
   int thisHour = -1;
   int httpCode = -1;
 
@@ -16,7 +17,6 @@ void fetch_and_decode_Forecast()
       Serial.println(ForecastEndpoint);
       http.begin(ForecastEndpoint); //Specify the URL
       httpCode = http.GET();      //Make the request
-      looper = 0;
       if (httpCode < 0) {
         Serial.printf("Error %i on Forecast HTTP request. "
                       "Retrying in 10 seconds.\r\n", httpCode);
@@ -91,8 +91,7 @@ void fetch_and_decode_Forecast()
       totSnow += WxForecast[thisHour].Snowfall;
 
       WxForecast[thisHour].Temperature = today["main"]["temp"];
-      //      if (Units == "I")
-      if (multiCity[whichCity].units == "imperial")
+      if (Units == "I")
         WxForecast[thisHour].Temperature =
           (WxForecast[thisHour].Temperature * 9 / 5) + 32;
       if (WxForecast[thisHour].Temperature < lowTempForecast)

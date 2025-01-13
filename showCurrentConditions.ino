@@ -107,6 +107,7 @@ void showCurrentCondx()
   float wWind;
   //  if (Units == "I")
   if (multiCity[whichCity].units == "metric")  // Convert m/s to kph
+    // if (unitsStrings[whichCity] == "metric")  // Convert m/s to kph
     wWind = current_wind_speed * 3.6;       // Convert m/s to kph
   //  else  // If imperial, it is already m/h
   //    wWind = current_wind_speed * 2.237;     // Convert m/s to mph
@@ -114,9 +115,11 @@ void showCurrentCondx()
   if (wWind > 9.99) {
     sprintf(workChar, "%.0f %s",
             wWind, multiCity[whichCity].units == "imperial" ? "m/h" : "k/h");
+    //      wWind, unitsStrings[whichCity] == "imperial" ? "m/h" : "k/h");
   } else {
     sprintf(workChar, "%.1f %s",
             wWind, multiCity[whichCity].units == "imperial" ? "m/h" : "k/h");
+    //      wWind, unitsStrings[whichCity] == "imperial" ? "m/h" : "k/h");
   }
   sprite.drawString(workChar, 55, yPos + 62);
   windDegStr = windDegIntToOrdinalDirection(current_wind_deg);

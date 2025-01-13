@@ -1,13 +1,16 @@
 /*
    This code is designed to run on a T-Display S3.
 
-#include <User_Setups/Setup206_LilyGo_T_Display_S3.h>  // Setup file for ESP32-S3
+#include <Custom_Setups/Setup206_LilyGo_T_Display_S3.h>  // Setup file for ESP32-S3
 
 */
 // Start of user customizations ------------------
 
-const char* ssid     = "ssid";
-const char* password = "pw";
+//const char* ssid     = "MikeysWAP";
+//const char* password = "Noogly99";
+
+const char* ssid     = "Converge2G";
+const char* password = "Lallave@Family7";
 
 int whichCity = 0;  // Put your preferred city in 0.
 int prevCity = whichCity;
@@ -23,9 +26,7 @@ struct multiCityStruct {
   String units;   // metric or imperial
   String ENV;     // POSIX Environmental Time string
 };
-// The city name shown on the temps overview screen does not come from here.
-//  It comes from the returned data packet from OWM.  That's to verify that
-//  the data is for the right place.
+
 multiCityStruct multiCity[MAX_CITY] = {
   //  City            Latitude     Longitude      Units       POSIX ENV Time string
   {"Bangui, RP",     "18.5376",   "120.7671",    "metric",   "PHT-8"},
@@ -33,15 +34,24 @@ multiCityStruct multiCity[MAX_CITY] = {
   {"Dayton, OH",     "39.75895",  "-84.19161",   "imperial", "EST5EDT,M3.2.0,M11.1.0"},
   {"Shreveport, LA", "32.523659", "-93.763504",  "imperial", "CST6CDT,M3.2.0/2:00:00,M11.1.0/2:00:00"}
 };
+//int iHomeOffset;      // Keep local offset to get local hour for display dimming.
 int localHour = -1;   // Force first pass update
 char cCharWork[200];
 time_t UTC, workTime;
 
+// POSIX TimeZone rule for where you are.
+//const char* time_zone = "America/New York=EST5EDT,M3.2.0,M11.1.0";  // for Penn.
+//String latstr = "40.449961891489025";  // Your latitude for Imperial, PA
+//String lonstr = "-80.24555540665442";  // Your longitude for Imperial, PA
+
 // Get OneCall API key.
-const String api_key = "YOUR_OWM_API_KEY";
+const String api_key = "2874af657bd3f25f664000b1cbaddc66";
 //const String api_key = "Your_OWM_API_key_here";  // Get OneCall API key.
+// Note: I stay up late and sleep late!
+//const int lowFetchRateStart =  2;  // 2 am, starts one data fetch per hour.
+//const int lowFetchRateEnd   = 12;  //12 (noon) starts 4 data fetches per hour.
 // Use 'M' (or anything else) for Metric or I for Imperial
-//String    Units             = "M";
+String    Units             = "M";
 
 // The buttons are used to bring the display back to life.  The display will
 //  remain on for the number of seconds of "blankSecs".  Then press a button
@@ -102,7 +112,7 @@ float lowTempForecast = 1000.;   // A very high temp to ensure correction.
 const int graphFloorMargin = 20;   // X axis here.
 const int graphLeftMargin  = 32;   // Y axis here from the left.
 float pixelsPerHundredthV;
-int   timePush, looper;
+int   timePush;
 
 #include <ArduinoJson.h>
 // Now done in the two parsing routines as per suggestion from the author.
