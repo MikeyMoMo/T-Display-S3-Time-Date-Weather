@@ -99,7 +99,7 @@ float lowTempForecast = 1000.;   // A very high temp to ensure correction.
 const int graphFloorMargin = 20;   // X axis here.
 const int graphLeftMargin  = 32;   // Y axis here from the left.
 float pixelsPerHundredthV;
-int   timePush;
+int   timePush, looper;
 
 #include <ArduinoJson.h>
 // Now done in the two parsing routines as per suggestion from the author.
