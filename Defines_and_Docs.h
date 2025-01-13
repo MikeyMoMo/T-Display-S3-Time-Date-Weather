@@ -41,10 +41,7 @@ char cCharWork[200];
 time_t UTC, workTime;
 
 // Get OneCall API key.
-const String api_key = "2874af657bd3f25f664000b1cbaddc66";
-//const String api_key = "Your_OWM_API_key_here";  // Get OneCall API key.
-// Use 'M' (or anything else) for Metric or I for Imperial
-//String    Units             = "M";
+const String api_key = "Your_OWM_API_key_here";  // Get OneCall API key.
 
 // The buttons are used to bring the display back to life.  The display will
 //  remain on for the number of seconds of "blankSecs".  Then press a button
