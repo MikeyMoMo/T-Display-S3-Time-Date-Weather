@@ -152,27 +152,27 @@ void setup()
   tft.drawString("from OWM Server.", xCenter, iDisplayLine4);
 
   // I know, should have done this with do/while to force 1 pass.
-  badLastFetchF = true;  badLastFetchO = true;  // Force pass.
-  looper = 0;
-  while (badLastFetchF) {
-    fetch_and_decode_Forecast();
-    if (looper++ > 5) {
-      tft.fillScreen(TFT_WHITE); tft.setTextColor(TFT_BLACK, TFT_WHITE);
-      tft.drawString("Cannot get Forecast.", xCenter, iDisplayLine2);
-      tft.drawString("Program cannot continue.", xCenter, iDisplayLine4);
-      while (1);
-    }
-  }
-  looper = 0;
-  while (badLastFetchO) {
-    fetch_and_decode_OneCall();
-    if (looper++ > 5) {
-      tft.fillScreen(TFT_WHITE); tft.setTextColor(TFT_BLACK, TFT_WHITE);
-      tft.drawString("Cannot get Forecast.", xCenter, iDisplayLine2);
-      tft.drawString("Program cannot continue.", xCenter, iDisplayLine4);
-      while (1);
-    }
-  }
+  //  badLastFetchF = true;  badLastFetchO = true;  // Force pass.
+  //  looper = 0;
+  //  while (badLastFetchF) {
+  fetch_and_decode_Forecast();
+  //    if (looper++ > 5) {
+  //      tft.fillScreen(TFT_WHITE); tft.setTextColor(TFT_BLACK, TFT_WHITE);
+  //      tft.drawString("Cannot get Forecast.", xCenter, iDisplayLine2);
+  //      tft.drawString("Program cannot continue.", xCenter, iDisplayLine4);
+  //      while (1);
+  //    }
+  //  }
+  //  looper = 0;
+  //  while (badLastFetchO) {
+  fetch_and_decode_OneCall();
+  //    if (looper++ > 5) {
+  //      tft.fillScreen(TFT_WHITE); tft.setTextColor(TFT_BLACK, TFT_WHITE);
+  //      tft.drawString("Cannot get Forecast.", xCenter, iDisplayLine2);
+  //      tft.drawString("Program cannot continue.", xCenter, iDisplayLine4);
+  //      while (1);
+  //    }
+  //  }
   uiNextFetchTime = millis() + uiFetchInterval;  // Remember when to fetch
 
   ledcSetup(0, 10000, 8);  // Prepare the display for dimming, timer 0.
@@ -242,7 +242,7 @@ void loop()
   }
   // For each press and release, cycle through the cities defined in the
   //  array of structs.  If the button is not pressed in 4 seconds do the
-  //  requested change, if any.  If the same city is selected as was 
+  //  requested change, if any.  If the same city is selected as was
   //  selected, only show a message and do not hit up OWM again right now.
   if (digitalRead(buttonCityChange) == pressed) {
     delay(50);
@@ -291,9 +291,10 @@ void loop()
       // Set the time zone for the newly selected city from the structs array.
       setenv("TZ", multiCity[whichCity].ENV.c_str(), 1); tzset();
 
-      badLastFetchF = true; badLastFetchO = true;
-      while (badLastFetchF) fetch_and_decode_Forecast();
-      while (badLastFetchO) fetch_and_decode_OneCall();
+      //      badLastFetchF = true; badLastFetchO = true;
+      //      while (badLastFetchF) fetch_and_decode_Forecast();
+      //      while (badLastFetchO) fetch_and_decode_OneCall();
+      fetch_and_decode_Forecast(); fetch_and_decode_OneCall();
       uiNextFetchTime = millis() + uiFetchInterval;  // Remember when to fetch
       sprite.unloadFont();
     } else {
@@ -357,9 +358,10 @@ void loop()
   getMyTime();  // Serial.println(fullTimeDate);
 
   if (millis() > uiNextFetchTime) {
-    badLastFetchF = true; badLastFetchO = true;
-    while (badLastFetchF) fetch_and_decode_Forecast();
-    while (badLastFetchO) fetch_and_decode_OneCall();
+    //    badLastFetchF = true; badLastFetchO = true;
+    //    while (badLastFetchF) fetch_and_decode_Forecast();
+    //    while (badLastFetchO) fetch_and_decode_OneCall();
+    fetch_and_decode_Forecast(); fetch_and_decode_OneCall();
     uiNextFetchTime = millis() + uiFetchInterval;  // Remember when to fetch
   }
   setBrightness();
