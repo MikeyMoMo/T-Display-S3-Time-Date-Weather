@@ -20,20 +20,43 @@ bool cityChangeInProgress = false;
 time_t cityChangeTimer;
 
 struct multiCityStruct {
-  String CityName;
-  String lat;     // Latitude
-  String lon;     // Longitude
-  String units;   // metric or imperial
-  String ENV;     // POSIX Environmental Time string
+  char* CityName;
+  char* lat;     // Latitude
+  char* lon;     // Longitude
+  char* units;   // metric or imperial
+  char* ENV;     // POSIX Environmental Time string
 };
+char* city1  = "Bangui, RP";
+char* lat1   = "18.537600";
+char* lon1   = "120.767100";
+char* unit1  = "metric";
+char* POSIX1 = "PHT-8";
+
+char* city2  = "Benicia, CA";
+char* lat2   = "38.053926";
+char* lon2   = "-122.155566";
+char* unit2  = "imperial";
+char* POSIX2 = "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00";
+
+char* city3  = "Dayton, OH";
+char* lat3   = "39.758950";
+char* lon3   = "-84.191610";
+char* unit3  = "imperial";
+char* POSIX3 = "EST5EDT,M3.2.0,M11.1.0";
+
+char* city4  = "Shreveport, LA";
+char* lat4   = "32.523659";
+char* lon4   = "-93.763504";
+char* unit4  = "imperial";
+char* POSIX4 = "CST6CDT,M3.2.0/2:00:00,M11.1.0/2:00:00";
 
 multiCityStruct multiCity[MAX_CITY] = {
-  //  City            Latitude     Longitude      Units       POSIX ENV Time string
-  {"Bangui, RP",     "18.5376",   "120.7671",    "metric",   "PHT-8"},
-  {"Benicia, CA",    "38.053926", "-122.155566", "imperial", "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00"},
-  {"Dayton, OH",     "39.75895",  "-84.19161",   "imperial", "EST5EDT,M3.2.0,M11.1.0"},
-  {"Shreveport, LA", "32.523659", "-93.763504",  "imperial", "CST6CDT,M3.2.0/2:00:00,M11.1.0/2:00:00"}
+  {city1, lat1, lon1, unit1, POSIX1},  // Bangui, RP
+  {city2, lat2, lon2, unit2, POSIX2},  // Benicia, CA
+  {city3, lat3, lon3, unit3, POSIX3},  // Dayton, OH
+  {city4, lat4, lon4, unit4, POSIX4}   // Shreveport, LA
 };
+
 //int iHomeOffset;      // Keep local offset to get local hour for display dimming.
 int localHour = -1;   // Force first pass update
 char cCharWork[200];
@@ -87,20 +110,20 @@ struct tm * timeinfo;
 time_t lastOn, testOn;
 char fullTimeDate[100];
 String sVer;
-bool badLastFetchF = false;  // Forecast fetched OK
-bool badLastFetchO = false;  // Onecall fetched OK
+//bool badLastFetchF = false;  // Forecast fetched OK
+//bool badLastFetchO = false;  // Onecall fetched OK
 // The default start city is the 0 element of the structs array.  It is
 //  usually the home city of the one you want to see the most.  I did not
 //  code in a preferences save.  No preferences are saved in this code.
 String oneCallEndpoint = "https://api.openweathermap.org/data/3.0/"
-                         "onecall?lat=" + multiCity[0].lat +
-                         "&lon=" + multiCity[0].lon +
-                         "&units=" + multiCity[0].units +
+                         "onecall?lat=" + String(multiCity[0].lat) +
+                         "&lon=" + String(multiCity[0].lon) +
+                         "&units=" + String(multiCity[0].units) +
                          "&exclude=minutely&appid=" + api_key;
 String ForecastEndpoint = "https://api.openweathermap.org/data/2.5/"
-                          "forecast?lat=" + multiCity[0].lat +
-                          "&lon=" + multiCity[0].lon +
-                          "&units=" + multiCity[0].units +
+                          "forecast?lat=" + String(multiCity[0].lat) +
+                          "&lon=" + String(multiCity[0].lon) +
+                          "&units=" + String(multiCity[0].units) +
                           "&exclude=minutely&appid=" + api_key;
 
 int prev_hour = -1, prev_sec = -1;

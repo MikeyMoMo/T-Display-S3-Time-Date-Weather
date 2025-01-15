@@ -12,7 +12,7 @@ void showCurrentCondx()
   sprite.setTextColor(TFT_WHITE, TFT_BLACK);
   //  drawArrayJpeg(Colorbar10, sizeof(Colorbar10), 132, 0);
   //  drawArrayJpeg(Colorbar5, sizeof(Colorbar5), 135, 0);
-  drawArrayJpeg(Colorbar2, sizeof(Colorbar2), 136, 0);
+  drawArrayJpeg(Colorbar2, sizeof(Colorbar2), 138, 0);
 
   for (int j = 0; j < 7; j++)
     sprite.drawString(SSDays[j], cax + (j * caw), cay, 2);

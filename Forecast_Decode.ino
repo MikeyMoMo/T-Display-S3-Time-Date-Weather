@@ -13,19 +13,19 @@ void fetch_and_decode_Forecast()
     http.setTimeout(10000);
     while (httpCode != 200) {
       Serial.print("\r\nOWM Forecast Request at ");
-      printMyTime();
+      getMyTime(); Serial.println(fullTimeDate);
       Serial.println(ForecastEndpoint);
       http.begin(ForecastEndpoint); //Specify the URL
       httpCode = http.GET();      //Make the request
-      if (httpCode < 0) {
+      if (httpCode != 200) {
         Serial.printf("Error %i on Forecast HTTP request. "
                       "Retrying in 10 seconds.\r\n", httpCode);
-        badLastFetchF = true;
-        if (looper++ > 5) return;
+//        badLastFetchF = true;
+        if (looper++ > 5) return;  // Give up for now
         delay(10000);
       }
     }
-    badLastFetchF = false;
+//    badLastFetchF = false;
     payload = http.getString();
     Serial.println("OWM Forecast Return Packet");
     Serial.println(payload);
@@ -164,6 +164,6 @@ void fetch_and_decode_Forecast()
     //    long city_sunset = city["sunset"]; // 1702459309
 
     Serial.print("OWM Forecast Complete at "); getMyTime();
-    printMyTime();
+    getMyTime(); Serial.println(fullTimeDate);
   }
 }

@@ -13,19 +13,19 @@ void fetch_and_decode_OneCall()
     http.setTimeout(10000);
     while (httpCode != 200) {
       Serial.print("\r\nOWM OneCall Request at ");
-      printMyTime();
+      getMyTime(); Serial.println(fullTimeDate);
       Serial.println(oneCallEndpoint);
       http.begin(oneCallEndpoint); //Specify the URL
       httpCode = http.GET();      //Make the request
-      if (httpCode < 0) {
+      if (httpCode != 200) {
         Serial.printf("Error %i on OneCall HTTP request. "
                       "Retrying in 10 seconds.\r\n", httpCode);
-        badLastFetchO = true;
+//        badLastFetchO = true;
         if (looper++ > 5) return;
         delay(10000);
       }
     }
-    badLastFetchO = false;
+//    badLastFetchO = false;
     payload = http.getString();
     Serial.println("OWM OneCall Return Packet");
     Serial.println(payload);
@@ -299,6 +299,7 @@ void fetch_and_decode_OneCall()
 #endif
     }
     Serial.print("OWM OneCall Complete at ");
-    printMyTime();
+    getMyTime(); Serial.println(fullTimeDate);
+    Serial.println("---------------------");
   }
 }
