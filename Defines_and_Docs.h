@@ -68,8 +68,7 @@ time_t UTC, workTime;
 //String lonstr = "-80.24555540665442";  // Your longitude for Imperial, PA
 
 // Get OneCall API key.
-const String api_key = "2874af657bd3f25f664000b1cbaddc66";
-//const String api_key = "Your_OWM_API_key_here";  // Get OneCall API key.
+const String api_key = "Your_OWM_API_key_here";  // Get OneCall API key.
 // Note: I stay up late and sleep late!
 //const int lowFetchRateStart =  2;  // 2 am, starts one data fetch per hour.
 //const int lowFetchRateEnd   = 12;  //12 (noon) starts 4 data fetches per hour.
