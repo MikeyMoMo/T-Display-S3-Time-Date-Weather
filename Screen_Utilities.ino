@@ -55,7 +55,7 @@ int findLastIndex(String str, char x)
   return index;
 }
 /***************************************************************************/
-String ConvertToLocalTime(long epoch)
+String ConvertToLocalTime(time_t epoch)
 /***************************************************************************/
 {
   // Returns 'HH:MMpm'
