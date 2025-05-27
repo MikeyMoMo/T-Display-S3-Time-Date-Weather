@@ -1,4 +1,17 @@
 /***************************************************************************/
+void showMemoryStats()
+/***************************************************************************/
+{
+  Serial.printf("Total heap:\t%u\r\n", ESP.getHeapSize());
+  Serial.printf("Free heap:\t%u\r\n", ESP.getFreeHeap());
+  Serial.printf("Total PSRAM:\t%u\r\n", ESP.getPsramSize());
+  Serial.printf("Free PSRAM:\t%d\r\n", ESP.getFreePsram());
+  //  Serial.printf("spiram size\t%u\r\n", esp_spiram_get_size());
+  //  Serial.printf("himem free\t%u\r\n", esp_himem_get_free_size());
+  //  Serial.printf("himem phys\t%u\r\n", esp_himem_get_phys_size());
+  //  Serial.printf("himem reserved\t%u\r\n", esp_himem_reserved_area_size());
+}
+/***************************************************************************/
 void getMyTime()
 /***************************************************************************/
 {
@@ -16,7 +29,7 @@ void getMyTime()
   strftime(timeWkDay, 4, "%a", &timeinfo); intDOW   = timeinfo.tm_wday;
   strftime(timeDOM, 4, "%d", &timeinfo);   intDOM   = timeinfo.tm_mday;
   clockString = SDays[intDOW]  + ", " + SMonths[intMonth] + " " +
-                      String(intDOM) + ", " + String(intYear);
+                String(intDOM) + ", " + String(intYear);
 
   dayInWeek   = timeinfo.tm_wday;  // Sunday = 0
   dayInMonth  = timeinfo.tm_mday;  // Day of the month (rationally starting at 1)
@@ -143,20 +156,19 @@ void ShowForecast()
 #define textCol 95
   // There are exactly 40 characters in font 2 across the screen.  Good luck!
   // Day Txx/yy 29 chars based on ID number.
-#if defined DO_ONECALL_PRINTS
+#if defined DO_FORECAST_PRINTS
   Serial.println("Here's the Forecast.");
 #endif
   sprite.fillSprite(TFT_BLACK);
   sprite.setTextDatum(TL_DATUM);
   sprite.setTextColor(TFT_WHITE, myBlue);
   // I know, this is stupid.  The extra spaces are to get the background
-  //  color.  Should be a drawFilledRect.  Just lazy.  Letting
+  //  color.  Should be a drawFilledRect.  Just lazy.
   sprite.drawString("Day       ",              0,  0, 2);
   sprite.drawString("Temps     ",             38,  0, 2);
   // sTown is pulled from the return packet to verify we got the
   //  right place.  It does not come from the struct arrays CityName field.
   forecast = "WX Forecast for " + sTown;
-  //  Serial.println(forecast);
   sprite.drawString("                                    ", textCol,  0, 2);
   sprite.drawString(forecast, textCol,  0, 2);
   for (i = 0; i < 7; i++) {
@@ -169,28 +181,27 @@ void ShowForecast()
 
     // The high and low temps expected for the day
     // tmpF = (current_temp * 9. / 5.) + 32.;  // Convert ºF to ºC.
-    if (Units == "I") {
-      sprintf(cMinTmp, "%3i", int((daily_item_temp_min[i] * 9. / 5.) + 32.));
-      sprintf(cMaxTmp, "%3i", int((daily_item_temp_max[i] * 9. / 5.) + 32.));
-    } else {
+    //    if (Units == "I") {
+//    if (multiCity[whichCity].units == "imperial") {
+//      sprintf(cMinTmp, "%3i", int((daily_item_temp_min[i] * 9. / 5.) + 32.));
+//      sprintf(cMaxTmp, "%3i", int((daily_item_temp_max[i] * 9. / 5.) + 32.));
+//    } else {
       sprintf(cMinTmp, "%3i", int(daily_item_temp_min[i]));
       sprintf(cMaxTmp, "%3i", int(daily_item_temp_max[i]));
-    }
+//    }
     forecast = String(cMinTmp) + "`/" + String(cMaxTmp) + "`";
     sprite.drawString(forecast, 28, yPos, 2);
 
     for (j = 0; j < WX_CONDITIONS; j++) {
       if (Conditions[j].Code == daily_item_weather_0_id[i]) break;
     }
-#if defined DO_ONECALL_PRINTS
+#if defined DO_FORECAST_PRINTS
     forecast.replace("`", "º");
-    Serial.print(forecast)
+    Serial.print(forecast);
+    Serial.printf(" %s\r\n", Conditions[j].Condition.c_str());
 #endif
     // The expected weather condition for the day
     sprite.setTextColor(Conditions[j].foreground,  Conditions[j].background);
-#if defined DO_ONECALL_PRINTS
-    Serial.printf(" %s\r\n", Conditions[j].Condition);
-#endif
     txtW = sprite.drawString(Conditions[j].Condition, textCol, yPos, 2);
     condX = daily_item_weather_0_id[i] / 100;
     if (condX == 5)  // If one of the rain entries, add pop
@@ -199,8 +210,12 @@ void ShowForecast()
     yPos += 22;
   }
   sprite.pushSprite(0, 0);
-  ledcWrite(pwmLedChannelTFT, extraScreensBrightness);
-#if defined DO_ONECALL_PRINTS
+  if (!screenOn) {
+    tft.writecommand(ST7789_DISPON);  // Turn on display hardware
+    screenOn = true;
+  }
+  ledcWrite(TFT_BL, screensExtraBright);       // Turn the display on bigly for init messages.
+#if defined DO_FORECAST_PRINTS
   Serial.println("-------------------");
 #endif
 }
@@ -297,7 +312,11 @@ void ShowSunMoon()
     yPos += 22;
   }
   sprite.pushSprite(0, 0);
-  ledcWrite(pwmLedChannelTFT, extraScreensBrightness);
+  if (!screenOn) {
+    tft.writecommand(ST7789_DISPON);  // Turn on display hardware
+    screenOn = true;
+  }
+  ledcWrite(TFT_BL, screensExtraBright);  // Turn the display on bigly for init messages.
 }
 /***************************************************************************/
 String moonPhase(float phase)
@@ -499,4 +518,10 @@ void jpegInfo() {
   Serial.print(F(  "MCU width  :")); Serial.println(JpegDec.MCUWidth);
   Serial.print(F(  "MCU height :")); Serial.println(JpegDec.MCUHeight);
   Serial.println(F("==============="));
+}
+/***************************************************************************/
+void printMyTime()
+/***************************************************************************/
+{
+  getMyTime(); Serial.println(fullTimeDate);
 }

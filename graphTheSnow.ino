@@ -158,7 +158,11 @@ void graphTheSnow()
     sprite.drawString("No significant Snow predicted", xCenter, yCenter - 25, 2);
     sprite.drawString("for the next 5 days", xCenter, yCenter + 20, 2);
   }
-  ledcWrite(pwmLedChannelTFT, extraScreensBrightness);  // Make it bright.
+  if (!screenOn) {
+    tft.writecommand(ST7789_DISPON);  // Turn on display hardware
+    screenOn = true;
+  }
+  ledcWrite(TFT_BL, screensExtraBright);  // Turn the display on bigly for init messages.
   sprite.pushSprite(0, 0);
   //  Serial.printf("Time for Snow graph was %lu ms.\r\n", millis() - startMillis);
 }

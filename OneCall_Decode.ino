@@ -2,46 +2,62 @@
 void fetch_and_decode_OneCall()
 /***************************************************************************/
 {
-  JsonDocument doc;
   int looper = 0;
   int thisHour = -1;
   int httpCode = -1;
 
   if ((WiFi.status() == WL_CONNECTED)) //Check the current connection status
   {
+    oneCallEndpoint = "https://api.openweathermap.org/data/3.0/"
+                      "onecall?lat=" + multiCity[whichCity].lat +
+                      "&lon=" + multiCity[whichCity].lon +
+                      "&units=" + multiCity[whichCity].units +
+                      "&exclude=minutely&appid=" + api_key;
+
     HTTPClient http;
     http.setTimeout(10000);
     while (httpCode != 200) {
       Serial.print("\r\nOWM OneCall Request at ");
-      getMyTime(); Serial.println(fullTimeDate);
+      getMyTime(); Serial.print(fullTimeDate);
+      Serial.printf(" for %s.\r\n", multiCity[whichCity].CityName.c_str());
       Serial.println(oneCallEndpoint);
-      http.begin(oneCallEndpoint); //Specify the URL
-      httpCode = http.GET();      //Make the request
+      http.begin("https://api.openweathermap.org/data/3.0/"
+                 "onecall?lat=" + multiCity[whichCity].lat +
+                 "&lon=" + multiCity[whichCity].lon +
+                 "&units=" + multiCity[whichCity].units +
+                 "&exclude=minutely&appid=" + api_key);  //Specify the URL et.al.
+      httpCode = http.GET();        //Make the request
       if (httpCode != 200) {
         Serial.printf("Error %i on OneCall HTTP request. "
                       "Retrying in 10 seconds.\r\n", httpCode);
-//        badLastFetchO = true;
-        if (looper++ > 5) return;
+        if (looper++ > 2) return;
         delay(10000);
       }
     }
-//    badLastFetchO = false;
-    payload = http.getString();
-    Serial.println("OWM OneCall Return Packet");
-    Serial.println(payload);
-
-    dataFetchHour = intHour; dataFetchMin = intMin;
-
-    error = deserializeJson(doc, payload);
+    JsonDocument doc;
+    //    payload = http.getString();
+    //    Serial.println("OWM OneCall Return Packet");
+    //    Serial.println(payload);
+    //
+    //    dataFetchHour = intHour; dataFetchMin = intMin;
+    //    DeserializationError error = deserializeJson(doc, payload);
+    //    if (error) {
+    //      Serial.print("OneCall deserializeJson() failed: ");
+    //      Serial.println(error.c_str());
+    //      return;
+    DeserializationError error = deserializeJson(doc, http.getStream());
     if (error) {
-      Serial.print("deserializeJson() failed: ");
-      Serial.println(error.c_str());
+      Serial.print(F("deserializeJson() failed: ")); Serial.println(error.f_str());
+      http.end();
       return;
     }
 
 #if defined DO_ONECALL_PRINTS
     Serial.println("From OneCall");
 #endif
+
+    // Now, save the data for later displaying.
+
     lat = doc["lat"]; // 18.5376
     lon = doc["lon"]; // 120.7671
     timezone = doc["timezone"]; // "Asia/Manila"
@@ -73,9 +89,12 @@ void fetch_and_decode_OneCall()
     JsonObject current_weather_0 = current["weather"][0];
 
     current_weather_0_id = current_weather_0["id"];
-    current_weather_0_main = current_weather_0["main"];
-    current_weather_0_description = current_weather_0["description"];
-    current_weather_0_icon = current_weather_0["icon"];
+    //current_weather_0_main = current_weather_0["main"];
+    current_weather_0_main = current_weather_0["main"].as<String>();
+    //    current_weather_0_description = current_weather_0["description"];
+    current_weather_0_description = current_weather_0["description"].as<String>();
+    //    current_weather_0_icon = current_weather_0["icon"];
+    current_weather_0_icon = current_weather_0["icon"].as<String>();
 
 #if defined DO_ONECALL_PRINTS
     Serial.printf("lat\t%f\r\n", lat);
@@ -98,8 +117,7 @@ void fetch_and_decode_OneCall()
     Serial.printf("current_dew_point\t%.2f\r\n", current_dew_point);
     Serial.printf("current_weather_0_id\t%i\r\n", current_weather_0_id);
     Serial.printf("current_weather_0_main\t%s\r\n", current_weather_0_main);
-    Serial.printf("current_weather_0_description\t%s\r\n",
-                  current_weather_0_description);
+    Serial.print("current_weather_0_description\t"); Serial.println(current_weather_0_description);
     Serial.printf("current_weather_0_icon\t%s\r\n", current_weather_0_icon);
 #endif
 
@@ -299,7 +317,7 @@ void fetch_and_decode_OneCall()
 #endif
     }
     Serial.print("OWM OneCall Complete at ");
-    getMyTime(); Serial.println(fullTimeDate);
+    printMyTime();
     Serial.println("---------------------");
   }
 }

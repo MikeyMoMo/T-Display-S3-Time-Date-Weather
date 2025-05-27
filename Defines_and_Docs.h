@@ -1,16 +1,10 @@
 /*
    This code is designed to run on a T-Display S3.
 
-#include <Custom_Setups/Setup206_LilyGo_T_Display_S3.h>  // Setup file for ESP32-S3
+  #include <Custom_Setups/Setup206_LilyGo_T_Display_S3.h>  // Setup file for ESP32-S3
 
 */
 // Start of user customizations ------------------
-
-//const char* ssid     = "MikeysWAP";
-//const char* password = "Noogly99";
-
-const char* ssid     = "Converge2G";
-const char* password = "Lallave@Family7";
 
 int whichCity = 0;  // Put your preferred city in 0.
 int prevCity = whichCity;
@@ -20,69 +14,90 @@ bool cityChangeInProgress = false;
 time_t cityChangeTimer;
 
 struct multiCityStruct {
-  char* CityName;
-  char* lat;     // Latitude
-  char* lon;     // Longitude
-  char* units;   // metric or imperial
-  char* ENV;     // POSIX Environmental Time string
+  String CityName;
+  String lat;     // Latitude
+  String lon;     // Longitude
+  String units;   // metric or imperial
+  String ENV;     // POSIX Environmental Time string
 };
-char* city1  = "Bangui, RP";
-char* lat1   = "18.537600";
-char* lon1   = "120.767100";
-char* unit1  = "metric";
-char* POSIX1 = "PHT-8";
 
-char* city2  = "Benicia, CA";
-char* lat2   = "38.053926";
-char* lon2   = "-122.155566";
-char* unit2  = "imperial";
-char* POSIX2 = "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00";
-
-char* city3  = "Dayton, OH";
-char* lat3   = "39.758950";
-char* lon3   = "-84.191610";
-char* unit3  = "imperial";
-char* POSIX3 = "EST5EDT,M3.2.0,M11.1.0";
-
-char* city4  = "Shreveport, LA";
-char* lat4   = "32.523659";
-char* lon4   = "-93.763504";
-char* unit4  = "imperial";
-char* POSIX4 = "CST6CDT,M3.2.0/2:00:00,M11.1.0/2:00:00";
+#if defined CONFIG_FOR_JOE
+//----------------------//
+const char* ssid     = "N_Port";
+const char* password = "helita1943";
+API key "1b96532c2039710e4a71b742b22e511f"  // for joe
 
 multiCityStruct multiCity[MAX_CITY] = {
-  {city1, lat1, lon1, unit1, POSIX1},  // Bangui, RP
-  {city2, lat2, lon2, unit2, POSIX2},  // Benicia, CA
-  {city3, lat3, lon3, unit3, POSIX3},  // Dayton, OH
-  {city4, lat4, lon4, unit4, POSIX4}   // Shreveport, LA
+  //City                 Latitude     Longitude      Units       POSIX ENV Time string
+  {"Bangui, RP",         "18.5376",   "120.7671",    "metric",   "PHT-8"},
+  {"Benicia, CA",        "38.053926", "-122.155566", "imperial", "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00"},
+  {"Cuyahoga Falls, OH", "41.136394", "-81.484254",  "imperial", "EST5EDT,M3.2.0,M11.1.0"},
+  {"San Clemente, PH",   "15.7081",   "120.3692",    "imperial", "PHT-8"}
 };
 
-//int iHomeOffset;      // Keep local offset to get local hour for display dimming.
+const char* ntpServer1 = "pool.ntp.org";
+const char* ntpServer2 = "time.nist.gov";
+
+int screenOrientation = 3;
+#define FILL_GRAPH      // If defined, fill color under the graph line.
+// To make the display stay on forever, just make this 3601
+
+#define BLANK_SECS 240  // 4 minutes on, then go to black to save the display.
+
+//                           0    1    2    3    4    5
+int ihourlyBrilliance[] = { 80,  80,  80,  80,  80,  80,      //  0- 5
+                            //6   7    8    9   10   11
+                            80,  80,  80,  80,  80, 100,      //  6-11
+                            //12  13   14   15   16   17
+                            120, 130, 140, 150, 160, 160,     // 12-17
+                            //18  19   20   21   22   23
+                            160, 160, 140, 120,  80,  80      // 18-23
+                          };
+//----------------------//
+#else  // for Mike
+//----------------------//
+const char* ssid     = "MikeysWAP";
+const char* password = "Noogly99";
+const String api_key = "2874af657bd3f25f664000b1cbaddc66";
+
+multiCityStruct multiCity[MAX_CITY] = {
+  //City              Latitude     Longitude      Units       POSIX ENV Time string
+  {"Bangui, RP",     "18.5376",   "120.7671",    "metric",   "PHT-8"},
+  {"Benicia, CA",    "38.053926", "-122.155566", "imperial", "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00"},
+  {"Dayton, OH",     "39.75895",  "-84.19161",   "imperial", "EST5EDT,M3.2.0,M11.1.0"},
+  {"Shreveport, LA", "32.523659", "-93.763504",  "imperial", "CST6CDT,M3.2.0/2:00:00,M11.1.0/2:00:00"}
+};
+
+const char* ntpServer1 = "oceania.pool.ntp.org";
+const char* ntpServer2 = "time.nist.gov";
+
+int screenOrientation = 3;
+#define FILL_GRAPH     // If defined, fill color under the graph line.
+// To make the display stay on forever, just make this 3601
+#define BLANK_SECS 240  // 4 minutes on, then go to black to save the display.
+
+//                           0    1    2    3    4    5
+int ihourlyBrilliance[] = { 80,  80,  80,  80,  80,  80,      //  0- 5
+                            //6   7    8    9   10   11
+                            80,  80,  80,  80,  80, 100,      //  6-11
+                            //12  13   14   15   16   17
+                            120, 130, 140, 150, 160, 160,     // 12-17
+                            //18  19   20   21   22   23
+                            160, 160, 140, 120,  80,  80      // 18-23
+                          };
+//----------------------//
+#endif
+
 int localHour = -1;   // Force first pass update
-char cCharWork[200];
+char cCharWork[200];  // Character string buildup area
 time_t UTC, workTime;
 
-// POSIX TimeZone rule for where you are.
-//const char* time_zone = "America/New York=EST5EDT,M3.2.0,M11.1.0";  // for Penn.
-//String latstr = "40.449961891489025";  // Your latitude for Imperial, PA
-//String lonstr = "-80.24555540665442";  // Your longitude for Imperial, PA
-
-// Get OneCall API key.
-const String api_key = "Your_OWM_API_key_here";  // Get OneCall API key.
-// Note: I stay up late and sleep late!
-//const int lowFetchRateStart =  2;  // 2 am, starts one data fetch per hour.
-//const int lowFetchRateEnd   = 12;  //12 (noon) starts 4 data fetches per hour.
-// Use 'M' (or anything else) for Metric or I for Imperial
-String    Units             = "M";
-
-// The buttons are used to bring the display back to life.  The display will
-//  remain on for the number of seconds of "blankSecs".  Then press a button
+// The button is used to bring the display back to life.  The display will
+//  remain on for the number of seconds of "BLANK_SECS".  Then press a button
 //  to see the display again.  Easy, peasy, peachy keen.
 #define buttonCityChange  0  // These 2 need to be change for different board.
 #define buttonShow       14
-#define pressed           0
-#define blankSecs 240  // 4 minutes on, then go to black to save the display.
-#define FILL_GRAPH     // If defined, fill color under the graph line.
+#define buttonPressed     0
 // End   of user customizations ------------------
 
 // Note: If there is a city change, the fetch will be done immediately then
@@ -91,8 +106,12 @@ String    Units             = "M";
 unsigned int uiFetchInterval = 31 * 60 * 1000;  // Fetch every 31 minutes
 unsigned int uiNextFetchTime;
 
+#define RO_MODE true   // Read-only mode
+#define RW_MODE false  // Read-write mode
+#include "Preferences.h"   // Remember stuff that's worth remembering.
+Preferences preferences;
+
 #include <TFT_eSPI.h>
-#define DISPLAY_DIM_PIN 38  // Runs the PWM transistor for display dimming.
 #include <JPEGDecoder.h>
 #include "Colorbar.h"
 
@@ -103,32 +122,19 @@ unsigned int uiNextFetchTime;
 // 2.0.17\tools\sdk\esp32s3\include\lwip\include\apps
 #include "esp_sntp.h"
 
-const char* ntpServer1 = "pool.ntp.org";
-const char* ntpServer2 = "time.nist.gov";
 struct tm * timeinfo;
 time_t lastOn, testOn;
 char fullTimeDate[100];
 String sVer;
-//bool badLastFetchF = false;  // Forecast fetched OK
-//bool badLastFetchO = false;  // Onecall fetched OK
 // The default start city is the 0 element of the structs array.  It is
 //  usually the home city of the one you want to see the most.  I did not
 //  code in a preferences save.  No preferences are saved in this code.
-String oneCallEndpoint = "https://api.openweathermap.org/data/3.0/"
-                         "onecall?lat=" + String(multiCity[0].lat) +
-                         "&lon=" + String(multiCity[0].lon) +
-                         "&units=" + String(multiCity[0].units) +
-                         "&exclude=minutely&appid=" + api_key;
-String ForecastEndpoint = "https://api.openweathermap.org/data/2.5/"
-                          "forecast?lat=" + String(multiCity[0].lat) +
-                          "&lon=" + String(multiCity[0].lon) +
-                          "&units=" + String(multiCity[0].units) +
-                          "&exclude=minutely&appid=" + api_key;
 
-int prev_hour = -1, prev_sec = -1;
-#define WX_CONDITIONS 55
-float highRainForecast = -1.;  // Unlikely to be lower than 0.  Will fix, later.
-float highSnowForecast = -1.;  // Unlikely to be lower than 0.  Will fix, later.
+String oneCallEndpoint, ForecastEndpoint;
+
+int   prev_hour = -1, prev_sec = -1;
+float highRainForecast = -1.;  // Unlikely to be lower than 0.  Will adjust, later.
+float highSnowForecast = -1.;  // Unlikely to be lower than 0.  Will adjust, later.
 float highTempForecast = -300.;  // A very low temp to ensure correction.
 float lowTempForecast = 1000.;   // A very high temp to ensure correction.
 const int graphFloorMargin = 20;   // X axis here.
@@ -136,12 +142,13 @@ const int graphLeftMargin  = 32;   // Y axis here from the left.
 float pixelsPerHundredthV;
 int   timePush;
 
+#define ARDUINOJSON_USE_DOUBLE 0
+#define ARDUINOJSON_USE_LONG_LONG 0
 #include <ArduinoJson.h>
 // Now done in the two parsing routines as per suggestion from the author.
 //JsonDocument doc;
-DeserializationError error;
+//DeserializationError error;
 
-//#include <JSON_Decoder.h> // https://github.com/Bodmer/JSON_Decoder
 String payload = ""; // Whole json packet returned
 float tmpC;          // Temperature from the JSON file in Celsius.
 float tmpF;          // Temperature converted to Farenheit.
@@ -172,17 +179,9 @@ bool    displayStatus = displayOn;
 #define myBlue   0x0AAD
 #define myGray   0xB5B6
 #define snowGraphLineColor TFT_WHITE
-#define rainGraphLineColor RGB565(100,100,255)
-#define tempGraphLineColor RGB565(200,075,075)
-//                           0    1    2    3    4    5
-int ihourlyBrilliance[] = { 80,  80,  80,  80,  80,  80,      //  0- 5
-                            //6   7    8    9   10   11
-                            80,  80,  80,  80,  80, 100,      //  6-11
-                            //12  13   14   15   16   17
-                            120, 130, 140, 150, 160, 160,     // 12-17
-                            //18  19   20   21   22   23
-                            160, 160, 140, 120,  80,  80      // 18-23
-                          };
+#define rainGraphLineColor RGB565(100,100,255)  // Also fill under the graph color
+#define tempGraphLineColor RGB565(200,075,075)  // Also fill under the graph color
+
 String IP;
 char   timeHour[3], timeMin[3], timeSec[3];
 char   myMonth[10], myYear[5], myDay[5];
@@ -249,7 +248,8 @@ const int pwmFreq = 5000;
 const int pwmResolution = 8;
 const int pwmLedChannelTFT = 0;
 const int ledBacklightFull = 250;
-const int extraScreensBrightness = 200;
+const int screensExtraBright = 200;
+bool screenOn = true;  // Starts up on. 
 
 const int iDisplayLine1 =  15;
 const int iDisplayLine2 =  45;
@@ -280,9 +280,12 @@ float current_wind_speed;
 int   current_wind_deg;
 float current_wind_gust;
 int   current_weather_0_id;
-const char* current_weather_0_main;
-const char* current_weather_0_description;
-const char* current_weather_0_icon;
+//const char* current_weather_0_main;
+String current_weather_0_main;
+//const char* current_weather_0_description;
+String current_weather_0_description;
+//const char* current_weather_0_icon;
+String current_weather_0_icon;
 long  minutely_item_dt;
 int   minutely_item_precipitation;
 
@@ -348,6 +351,7 @@ struct Condx_S
 //  most of them as the same but some had to be shortened a bit.
 // This is a sort of dictionary lookup.  I search for the code (1st element),
 //  then return the text and colors, elements 2-4.
+#define WX_CONDITIONS 55
 const struct Condx_S Conditions[WX_CONDITIONS] =
 {
   // Put the more frequent ones at the top for speed.

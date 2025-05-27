@@ -65,12 +65,15 @@ void showCurrentCondx()
   sprite.drawString("Hum",  0, yPos + 30);
   sprite.drawString("Wind", 0, yPos + 60);
   sprite.drawString("From", 0, yPos + 88);
-  
+
   // Clouds, Clear, etc.
+  //  Serial.print("Repeat: current_weather_0_main: ");
+  //  Serial.println(current_weather_0_main);
   sprite.drawString(current_weather_0_main, 0, yPos + 120);
   sprite.setTextColor(TFT_DARKGREY, TFT_BLACK);
   // This is so odd.  You have to negate to get a go signal on a match.
-  if (!strcmp(current_weather_0_main, "Clouds")) {
+  //  if (!strcmp(current_weather_0_main, "Clouds")) {
+  if (current_weather_0_main == "Clouds") {
     sprite.setTextDatum(TR_DATUM);
     sprite.drawString(String(current_clouds) + "%", 115, yPos + 120);  // was 110
     sprite.setTextDatum(TL_DATUM);

@@ -9,32 +9,36 @@ void fetch_and_decode_Forecast()
 
   if ((WiFi.status() == WL_CONNECTED)) //Check the current connection status
   {
+    ForecastEndpoint = "https://api.openweathermap.org/data/2.5/"
+                       "forecast?lat=" + multiCity[whichCity].lat +
+                       "&lon=" + multiCity[whichCity].lon +
+                       "&units=" + multiCity[whichCity].units +
+                       "&exclude=minutely&appid=" + api_key;
     HTTPClient http;
     http.setTimeout(10000);
     while (httpCode != 200) {
       Serial.print("\r\nOWM Forecast Request at ");
-      getMyTime(); Serial.println(fullTimeDate);
+      getMyTime(); Serial.print(fullTimeDate);
+      Serial.printf(" for %s.\r\n", multiCity[whichCity].CityName.c_str());
       Serial.println(ForecastEndpoint);
-      http.begin(ForecastEndpoint); //Specify the URL
-      httpCode = http.GET();      //Make the request
+      http.begin(ForecastEndpoint);  //Specify the URL
+      httpCode = http.GET();         //Make the request
       if (httpCode != 200) {
         Serial.printf("Error %i on Forecast HTTP request. "
                       "Retrying in 10 seconds.\r\n", httpCode);
-//        badLastFetchF = true;
-        if (looper++ > 5) return;  // Give up for now
+        if (looper++ > 2) return;  // Give up for now
         delay(10000);
       }
     }
-//    badLastFetchF = false;
     payload = http.getString();
     Serial.println("OWM Forecast Return Packet");
     Serial.println(payload);
 
     dataFetchHour = intHour; dataFetchMin = intMin;
 
-    error = deserializeJson(doc, payload);
+    DeserializationError error = deserializeJson(doc, payload);
     if (error) {
-      Serial.print("deserializeJson() failed: ");
+      Serial.print("Forecast deserializeJson() failed: ");
       Serial.println(error.c_str());
       return;
     }
@@ -44,6 +48,9 @@ void fetch_and_decode_Forecast()
 #if defined DO_FORECAST_PRINTS
     Serial.println("From Forecast");
 #endif
+
+    // Now, save the data for later displaying.
+
     const char* cod = doc["cod"]; // "200", we hope!
     int message = doc["message"]; // 0
     ThreeHourSamples = doc["cnt"]; // 40 is 5 days of 3-hourly predictions.
@@ -91,9 +98,10 @@ void fetch_and_decode_Forecast()
       totSnow += WxForecast[thisHour].Snowfall;
 
       WxForecast[thisHour].Temperature = today["main"]["temp"];
-      if (Units == "I")
-        WxForecast[thisHour].Temperature =
-          (WxForecast[thisHour].Temperature * 9 / 5) + 32;
+      //      if (Units == "I")
+      //      if (multiCity[whichCity].units == "imperial")
+      //        WxForecast[thisHour].Temperature =
+      //          (WxForecast[thisHour].Temperature * 9. / 5.) + 32;
       if (WxForecast[thisHour].Temperature < lowTempForecast)
         lowTempForecast = WxForecast[thisHour].Temperature;
       if (WxForecast[thisHour].Temperature > highTempForecast)

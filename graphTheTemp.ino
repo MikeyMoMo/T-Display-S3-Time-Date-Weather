@@ -132,7 +132,11 @@ void graphTheTemp()
       }
       break;
   }
-  ledcWrite(pwmLedChannelTFT, extraScreensBrightness);  // Make it bright.
+  if (!screenOn) {
+    tft.writecommand(ST7789_DISPON);  // Turn on display hardware
+    screenOn = true;
+  }
+  ledcWrite(TFT_BL, screensExtraBright);  // Turn the display on bigly for init messages.
   sprite.pushSprite(0, 0);
   //  Serial.printf("Time for Temp graph was %lu ms.\r\n", millis() - startMillis);
 }
