@@ -25,7 +25,7 @@ struct multiCityStruct {
 //----------------------//
 const char* ssid     = "N_Port";
 const char* password = "helita1943";
-API key "1b96532c2039710e4a71b742b22e511f"  // for joe
+API key "YOUR_OWM_API_KEY_HERE"  // for joe
 
 multiCityStruct multiCity[MAX_CITY] = {
   //City                 Latitude     Longitude      Units       POSIX ENV Time string
@@ -58,7 +58,7 @@ int ihourlyBrilliance[] = { 80,  80,  80,  80,  80,  80,      //  0- 5
 //----------------------//
 const char* ssid     = "MikeysWAP";
 const char* password = "Noogly99";
-const String api_key = "2874af657bd3f25f664000b1cbaddc66";
+const String api_key = "YOUR_OWM_API_KEY_HERE";
 
 multiCityStruct multiCity[MAX_CITY] = {
   //City              Latitude     Longitude      Units       POSIX ENV Time string
