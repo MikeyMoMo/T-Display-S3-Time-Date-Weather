@@ -81,12 +81,18 @@ void fetch_and_decode_Forecast()
       Serial.print(ConvertToLocalTime(WxForecast[thisHour].dt));
 #endif
 
-      WxForecast[thisHour].Rainfall = today["rain"]["3h"];
+      WxForecast[thisHour].Rainfall = today["rain"]["3h"]; 
       WxForecast[thisHour].Snowfall = today["snow"]["3h"];
+      
+      if (multiCity[whichCity].units == "imperial") {
+        WxForecast[thisHour].Rainfall *= .0394;
+        WxForecast[thisHour].Snowfall *= .0394;
+      }
+
 #if defined DO_FORECAST_PRINTS
-      Serial.printf("Rain %i: %.2f\r\n",
+      Serial.printf(" Rain %i: %.2f, ",
                     thisHour, WxForecast[thisHour].Rainfall);
-      Serial.printf("Snow %i: %.2f\r\n",
+      Serial.printf(" Snow %i: %.2f\r\n",
                     thisHour, WxForecast[thisHour].Snowfall);
 #endif
       if (WxForecast[thisHour].Rainfall > highRainForecast)

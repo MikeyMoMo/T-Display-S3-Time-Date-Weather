@@ -153,3 +153,124 @@ void graphTheRain()
   sprite.pushSprite(0, 0);
   //  Serial.printf("Time for Rain graph was %lu ms.\r\n", millis() - startMillis);
 }
+
+///***************************************************************************/
+//// Refactored version of graphTheRain()
+///***************************************************************************/
+//void graphTheRain() {
+//  setupGraph();
+//  expandRainfallData();
+//  drawGraphBackground();
+//  plotRainfallGraph();
+//  finalizeGraph();
+//}
+///***************************************************************************/
+//void setupGraph()
+///***************************************************************************/
+//{
+//  float pixelsPerSampleH = (tft.width() - graphLeftMargin) / ThreeHourSamples;
+//  int yRange = ceil(highRainForecast);
+//  pixelsPerHundredthV = (yRange == 0) ? 0 : (tft.height() - graphFloorMargin) / (yRange * 100.);
+//
+//  String legend = (multiCity[whichCity].units == "imperial") ?
+//                  "3-Hourly Rainfall amount (in) (5 Days)" :
+//                  "3-Hourly Rainfall amount (mm) (5 Days)";
+//
+//  sprite.fillSprite(TFT_BLACK);
+//  sprite.setTextColor(TFT_YELLOW, TFT_BLACK);
+//  sprite.setTextDatum(TC_DATUM);
+//  sprite.drawString(legend, (tft.width() + graphLeftMargin) / 2, 0, 2);
+//}
+///***************************************************************************/
+//void expandRainfallData()
+///***************************************************************************/
+//{
+//  for (int i = 0; i < ThreeHourSamples; i++) {
+//    expandedData[i * intermediatesCt] = WxForecast[i].Rainfall;
+//  }
+//  calcIntermediates(expandedData, false);
+//}
+///***************************************************************************/
+//void drawGraphBackground()
+///***************************************************************************/
+//{
+//  sprite.drawFastVLine(graphLeftMargin, 0, tft.height() - graphFloorMargin, TFT_YELLOW);
+//  sprite.drawFastHLine(graphLeftMargin, tft.height() - graphFloorMargin, (tft.width() - graphFloorMargin * 2) - 5, TFT_YELLOW);
+//  drawDayMarkers();
+//}
+///***************************************************************************/
+//void drawDayMarkers()
+///***************************************************************************/
+//{
+//  int prevDay = -1, intBackup, intMyDay, dayX;
+//  time_t tm = WxForecast[i].dt;
+//  struct tm *now_tm = localtime(&tm);
+//
+//  for (int i = 0; i < ThreeHourSamples - 1; i++) {
+//    //    intMyDay = localtime(&WxForecast[i].dt)->tm_wday;
+//    time_t tm = WxForecast[i].dt;
+//    intMyDay = now_tm->tm_wday;
+//    if (prevDay != intMyDay) {
+//      intBackup = now_tm->tm_hour / 3 * pixelsPerSampleH;
+//      dayX = pixelsPerSampleH * i + graphLeftMargin - intBackup + 18;
+//      if (dayX >= graphLeftMargin)
+//        sprite.drawString(SDays[intMyDay], dayX, tft.height() - graphFloorMargin + 3, 2);
+//      drawDashLineV(pixelsPerSampleH * i + graphLeftMargin, tft.height() - graphFloorMargin, 20, 3, 6, TFT_DARKGREY, TFT_BLACK);
+//      prevDay = intMyDay;
+//    }
+//  }
+//}
+///***************************************************************************/
+//void plotRainfallGraph()
+///***************************************************************************/
+//{
+//  float lastX = graphLeftMargin;
+//  float lastY = tft.height() - graphFloorMargin - (expandedData[0] * 100 * pixelsPerHundredthV);
+//  for (int i = 0; i < (ThreeHourSamples * intermediatesCt) - 5; i++) {
+//    float thisX = (pixelsPerSampleH / intermediatesCt) * (i + 1) + graphLeftMargin;
+//    float thisY = tft.height() - graphFloorMargin - (expandedData[i] * 100 * pixelsPerHundredthV);
+//    sprite.drawLine(lastX, lastY, thisX, thisY, rainGraphLineColor);
+//#if defined FILL_GRAPH
+//    sprite.drawLine(thisX, tft.height() - graphFloorMargin, thisX, thisY, rainGraphLineColor);
+//    sprite.drawLine(thisX - 1, tft.height() - graphFloorMargin, thisX - 1, lastY, rainGraphLineColor);
+//    sprite.drawLine(thisX - 1, tft.height() - graphFloorMargin, thisX - 1, thisY, rainGraphLineColor);
+//#endif
+//    lastX = thisX;
+//    lastY = thisY;
+//  }
+//}
+///***************************************************************************/
+//void finalizeGraph()
+///***************************************************************************/
+//{
+//  sprite.setTextDatum(BR_DATUM);
+//  sprite.drawString(String(ceil(highRainForecast), 0), graphLeftMargin - 2, 15, 2);
+//  sprite.drawString("0", graphLeftMargin - 2, tft.height() - graphFloorMargin + 3, 2);
+//
+//  drawYAxisScale();
+//  if (totRain < .05) {
+//    sprite.setTextDatum(MC_DATUM);
+//    sprite.drawString("No significant Rain predicted", xCenter, yCenter - 25, 2);
+//    sprite.drawString("for the next 5 days", xCenter, yCenter + 20, 2);
+//  }
+//
+//  if (!screenOn) {
+//    tft.writecommand(ST7789_DISPON);
+//    screenOn = true;
+//  }
+//
+//  ledcWrite(TFT_BL, screensExtraBright);
+//  sprite.pushSprite(0, 0);
+//}
+///***************************************************************************/
+//void drawYAxisScale()
+///***************************************************************************/
+//{
+//  int yRange = ceil(highRainForecast);
+//  if (yRange == 0) return;
+//
+//  float scalePositions[] = {0.8, 0.6, 0.4, 0.2};
+//  for (float pos : scalePositions) {
+//    if (yRange >= pos * 5) drawYAxisScaleLines(pos, 0, yRange);
+//  }
+//}

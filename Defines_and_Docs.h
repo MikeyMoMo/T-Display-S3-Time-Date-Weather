@@ -1,3 +1,4 @@
+//#define CONFIG_FOR_JOE
 /*
    This code is designed to run on a T-Display S3.
 
@@ -8,10 +9,12 @@
 
 int whichCity = 0;  // Put your preferred city in 0.
 int prevCity = whichCity;
-#define MAX_CITY 4  // The number of cities you have defined.
 bool forceDisplayOn = false;
 bool cityChangeInProgress = false;
 time_t cityChangeTimer;
+
+#define ORIENT_POWER_RIGHT 1
+#define ORIENT_POWER_LEFT  3
 
 struct multiCityStruct {
   String CityName;
@@ -23,22 +26,33 @@ struct multiCityStruct {
 
 #if defined CONFIG_FOR_JOE
 //----------------------//
-const char* ssid     = "N_Port";
-const char* password = "helita1943";
-API key "YOUR_OWM_API_KEY_HERE"  // for joe
+//const char*  ssid     = "N_Port";
+//const char*  password = "helita1943";
+const String api_key  = "1b96532c2039710e4a71b742b22e511f";  // for joe
 
+#define MAX_CITY 4  // The number of cities you have defined.
 multiCityStruct multiCity[MAX_CITY] = {
-  //City                 Latitude     Longitude      Units       POSIX ENV Time string
-  {"Bangui, RP",         "18.5376",   "120.7671",    "metric",   "PHT-8"},
-  {"Benicia, CA",        "38.053926", "-122.155566", "imperial", "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00"},
-  {"Cuyahoga Falls, OH", "41.136394", "-81.484254",  "imperial", "EST5EDT,M3.2.0,M11.1.0"},
-  {"San Clemente, PH",   "15.7081",   "120.3692",    "imperial", "PHT-8"}
+
+  { "Bangui, RP",  // City
+    //Latitude    Longitude      Units       POSIX ENV Time string
+    "18.5376",   "120.7671",    "metric",   "PHT-8"
+  },
+  { "Benicia, CA",
+    "38.053926", "-122.155566", "imperial", "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00"
+  },
+  { "Cuyahoga Falls, OH",
+    "41.136394", "-81.484254",  "imperial", "EST5EDT,M3.2.0,M11.1.0"
+  },
+  { "San Clemente, PH",
+    "15.7081",   "120.3692",    "imperial", "PHT-8"
+  }
 };
 
 const char* ntpServer1 = "pool.ntp.org";
 const char* ntpServer2 = "time.nist.gov";
 
-int screenOrientation = 3;
+int myOrientation = ORIENT_POWER_LEFT;
+
 #define FILL_GRAPH      // If defined, fill color under the graph line.
 // To make the display stay on forever, just make this 3601
 
@@ -56,22 +70,34 @@ int ihourlyBrilliance[] = { 80,  80,  80,  80,  80,  80,      //  0- 5
 //----------------------//
 #else  // for Mike
 //----------------------//
-const char* ssid     = "MikeysWAP";
-const char* password = "Noogly99";
-const String api_key = "YOUR_OWM_API_KEY_HERE";
+//const char* ssid     = "MikeysWAP";
+//const char* password = "Noogly99";
+const String api_key = "2874af657bd3f25f664000b1cbaddc66";
 
+#define MAX_CITY 5  // The number of cities you have defined.
 multiCityStruct multiCity[MAX_CITY] = {
-  //City              Latitude     Longitude      Units       POSIX ENV Time string
-  {"Bangui, RP",     "18.5376",   "120.7671",    "metric",   "PHT-8"},
-  {"Benicia, CA",    "38.053926", "-122.155566", "imperial", "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00"},
-  {"Dayton, OH",     "39.75895",  "-84.19161",   "imperial", "EST5EDT,M3.2.0,M11.1.0"},
-  {"Shreveport, LA", "32.523659", "-93.763504",  "imperial", "CST6CDT,M3.2.0/2:00:00,M11.1.0/2:00:00"}
+  { "Bangui, RP",  // City
+    //Latitude    Longitude      Units       POSIX ENV Time string
+    "18.5376",   "120.7671",    "metric",   "PHT-8"
+  },
+  { "Benicia, CA",
+    "38.053926", "-122.155566", "imperial", "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00"
+  },
+  { "Dayton, OH",
+    "39.75895",  "-84.19161",   "imperial", "EST5EDT,M3.2.0,M11.1.0"
+  },
+  { "Shreveport, LA",
+    "32.523659", "-93.763504",  "imperial", "CST6CDT,M3.2.0/2:00:00,M11.1.0/2:00:00"
+  },
+  { "San Clemente, PH",
+    "15.7081",   "120.3692",    "imperial", "PHT-8"
+  },
 };
 
 const char* ntpServer1 = "oceania.pool.ntp.org";
 const char* ntpServer2 = "time.nist.gov";
 
-int screenOrientation = 3;
+int myOrientation = ORIENT_POWER_LEFT;
 #define FILL_GRAPH     // If defined, fill color under the graph line.
 // To make the display stay on forever, just make this 3601
 #define BLANK_SECS 240  // 4 minutes on, then go to black to save the display.
@@ -86,7 +112,7 @@ int ihourlyBrilliance[] = { 80,  80,  80,  80,  80,  80,      //  0- 5
                             160, 160, 140, 120,  80,  80      // 18-23
                           };
 //----------------------//
-#endif
+#endif  // End for Mike //
 
 int localHour = -1;   // Force first pass update
 char cCharWork[200];  // Character string buildup area
@@ -95,14 +121,17 @@ time_t UTC, workTime;
 // The button is used to bring the display back to life.  The display will
 //  remain on for the number of seconds of "BLANK_SECS".  Then press a button
 //  to see the display again.  Easy, peasy, peachy keen.
-#define buttonCityChange  0  // These 2 need to be change for different board.
-#define buttonShow       14
-#define buttonPressed     0
-// End   of user customizations ------------------
+// These 2 need to be changed for different board.
+int buttonCityChange;  // On T-Display  0 with orientation 3 (power on left)
+int buttonShow;        // On T-Display 14 with orientation 3 (power on left)
+
+#define buttonPressed 0
+
+// End of user customizations ------------------
 
 // Note: If there is a city change, the fetch will be done immediately then
 //       every uiFetchInterval minutes aferwards unless there is another
-//       city change.  No more dual rate fetch.
+//       city change.
 unsigned int uiFetchInterval = 31 * 60 * 1000;  // Fetch every 31 minutes
 unsigned int uiNextFetchTime;
 
@@ -115,8 +144,11 @@ Preferences preferences;
 #include <JPEGDecoder.h>
 #include "Colorbar.h"
 
-#include <WiFi.h>
+//#include <WiFi.h>
+#include "WiFiManager.h"    // https://github.com/tzapu/WiFiManager
+WiFiManager wifiManager;
 #include <HTTPClient.h>
+const char* myPortalName = "WeatherCC";
 
 //C:\Users\bangu\AppData\Local\Arduino15\packages\esp32\hardware\esp32\
 // 2.0.17\tools\sdk\esp32s3\include\lwip\include\apps
@@ -178,6 +210,7 @@ bool    displayStatus = displayOn;
 #define RGB565(r,g,b) ((((r>>3)<<11) | ((g>>2)<<5) | (b>>3)))
 #define myBlue   0x0AAD
 #define myGray   0xB5B6
+#define Red      RGB565(255,0,0)
 #define snowGraphLineColor TFT_WHITE
 #define rainGraphLineColor RGB565(100,100,255)  // Also fill under the graph color
 #define tempGraphLineColor RGB565(200,075,075)  // Also fill under the graph color
@@ -249,7 +282,7 @@ const int pwmResolution = 8;
 const int pwmLedChannelTFT = 0;
 const int ledBacklightFull = 250;
 const int screensExtraBright = 200;
-bool screenOn = true;  // Starts up on. 
+bool screenOn = true;  // Starts up on.
 
 const int iDisplayLine1 =  15;
 const int iDisplayLine2 =  45;
