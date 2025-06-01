@@ -182,13 +182,13 @@ void ShowForecast()
     // The high and low temps expected for the day
     // tmpF = (current_temp * 9. / 5.) + 32.;  // Convert ºF to ºC.
     //    if (Units == "I") {
-//    if (multiCity[whichCity].units == "imperial") {
-//      sprintf(cMinTmp, "%3i", int((daily_item_temp_min[i] * 9. / 5.) + 32.));
-//      sprintf(cMaxTmp, "%3i", int((daily_item_temp_max[i] * 9. / 5.) + 32.));
-//    } else {
-      sprintf(cMinTmp, "%3i", int(daily_item_temp_min[i]));
-      sprintf(cMaxTmp, "%3i", int(daily_item_temp_max[i]));
-//    }
+    //    if (multiCity[whichCity].units == "imperial") {
+    //      sprintf(cMinTmp, "%3i", int((daily_item_temp_min[i] * 9. / 5.) + 32.));
+    //      sprintf(cMaxTmp, "%3i", int((daily_item_temp_max[i] * 9. / 5.) + 32.));
+    //    } else {
+    sprintf(cMinTmp, "%3i", int(daily_item_temp_min[i]));
+    sprintf(cMaxTmp, "%3i", int(daily_item_temp_max[i]));
+    //    }
     forecast = String(cMinTmp) + "`/" + String(cMaxTmp) + "`";
     sprite.drawString(forecast, 28, yPos, 2);
 
@@ -524,4 +524,30 @@ void printMyTime()
 /***************************************************************************/
 {
   getMyTime(); Serial.println(fullTimeDate);
+}
+/***************************************************************************/
+void drawGradientLine(TFT_eSprite *targetSprite,
+                      int x0, int y0, int x1, int y1,
+                      uint16_t colorStart, uint16_t colorEnd)
+/***************************************************************************/
+{
+  int steps = abs(x1 - x0) > abs(y1 - y0) ? abs(x1 - x0) : abs(y1 - y0);
+  int x = x0, y = y0;
+  for (int i = 0; i <= steps; i++) {
+    pctBlend = (float)i / steps;
+    blendedColor = alphaBlend((uint8_t)(pctBlend * 255), colorEnd, colorStart);
+    targetSprite->drawPixel(x, y, blendedColor);
+    if ((x0 - x1) == 0) y1 > y0 ? y++ : y--;
+    if ((y0 - y1) == 0) x1 > x0 ? x++ : x--;
+  }
+}
+/***************************************************************************/
+uint16_t alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc)
+/***************************************************************************/
+{
+  uint32_t rxb = bgc & 0xF81F;
+  rxb += ((fgc & 0xF81F) - rxb) * (alpha >> 2) >> 6;
+  uint32_t xgx = bgc & 0x07E0;
+  xgx += ((fgc & 0x07E0) - xgx) * alpha >> 8;
+  return (rxb & 0xF81F) | (xgx & 0x07E0);
 }

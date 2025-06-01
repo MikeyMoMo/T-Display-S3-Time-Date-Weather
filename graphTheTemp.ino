@@ -68,12 +68,29 @@ void graphTheTemp()
     thisY = thisY * 100. * pixelsPerHundredthV;
     sprite.drawLine(lastX, lastY, thisX, thisY, tempGraphLineColor);
 #if defined FILL_GRAPH
-    sprite.drawLine(thisX, tft.height() - graphFloorMargin, thisX, thisY,
-                    tempGraphLineColor);
+#if defined DO_GRADIENT
+    drawGradientLine(&sprite,
+                     thisX, tft.height() - graphFloorMargin, thisX, thisY,
+                     TFT_PINK, tempGraphLineColor);
+
     if (thisX - lastX > 1) {
       // The reason I do this twice is that it was leaving a pixel or two out of
       //  being colored when either or these was used, alone.  And they were different
       //  pixels.  So, by using them both, I get all pixels filled in.
+      drawGradientLine(&sprite,
+                       thisX - 1, tft.height() - graphFloorMargin, thisX - 1, lastY,
+                       TFT_PINK, tempGraphLineColor);
+      drawGradientLine(&sprite,
+                       thisX - 1, tft.height() - graphFloorMargin, thisX - 1, thisY,
+                       TFT_PINK, tempGraphLineColor);
+    }
+#else
+    sprite.drawLine(thisX, tft.height() - graphFloorMargin, thisX, thisY,
+                    tempGraphLineColor);
+    if (thisX - lastX > 1) {
+      //      The reason I do this twice is that it was leaving a pixel or two out of
+      //        being colored when either or these was used, alone.  And they were different
+      //        pixels.  So, by using them both, I get all pixels filled in.
       sprite.drawLine(thisX - 1, tft.height() - graphFloorMargin,
                       thisX - 1, lastY, tempGraphLineColor);
       sprite.drawLine(thisX - 1, tft.height() - graphFloorMargin,
@@ -81,8 +98,10 @@ void graphTheTemp()
     }
 #endif
     // Remember starting position for next line segment.
-    lastX = thisX, lastY = thisY;
+    lastX = thisX; lastY = thisY;
   }
+#endif
+
   // Decorations part 2
   sprite.setTextDatum(BR_DATUM);
   sprite.drawString(String(ceil(highTempForecast), 0),

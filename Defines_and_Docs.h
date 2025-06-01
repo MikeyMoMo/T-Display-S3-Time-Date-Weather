@@ -53,9 +53,10 @@ const char* ntpServer2 = "time.nist.gov";
 
 int myOrientation = ORIENT_POWER_LEFT;
 
-#define FILL_GRAPH      // If defined, fill color under the graph line.
-// To make the display stay on forever, just make this 3601
+#define FILL_GRAPH   // If defined, fill color under the graph line.
+#define DO_GRADIENT  // If defined, use gradient fill for graphs.  
 
+// To make the display stay on forever, just make this 3601
 #define BLANK_SECS 240  // 4 minutes on, then go to black to save the display.
 
 //                           0    1    2    3    4    5
@@ -98,7 +99,10 @@ const char* ntpServer1 = "oceania.pool.ntp.org";
 const char* ntpServer2 = "time.nist.gov";
 
 int myOrientation = ORIENT_POWER_LEFT;
-#define FILL_GRAPH     // If defined, fill color under the graph line.
+
+#define FILL_GRAPH   // If defined, fill color under the graph line.
+#define DO_GRADIENT  // If defined, use gradient fill for graphs.  
+
 // To make the display stay on forever, just make this 3601
 #define BLANK_SECS 240  // 4 minutes on, then go to black to save the display.
 
@@ -212,7 +216,7 @@ bool    displayStatus = displayOn;
 #define myGray   0xB5B6
 #define Red      RGB565(255,0,0)
 #define snowGraphLineColor TFT_WHITE
-#define rainGraphLineColor RGB565(100,100,255)  // Also fill under the graph color
+#define rainGraphLineColor RGB565(50,50,255)  // Also fill under the graph color
 #define tempGraphLineColor RGB565(200,075,075)  // Also fill under the graph color
 
 String IP;
@@ -225,7 +229,8 @@ int    intHour, intMin, intSec, intMonth, intYear, intDOM, intDOW;
 int    dayInWeek;
 int    xCenter, yCenter;
 float  totRain = 0., totSnow = 0.;
-
+float  pctBlend;
+uint16_t blendedColor;
 int    yPos;
 
 char   workChar[100];

@@ -79,6 +79,19 @@ void graphTheRain()
     //    Serial.printf("lastX %.2f, lastY %.2f, thisX %.2f, thisY %.2f\r\n",
     //                  lastX, lastY, thisX, thisY);
 #if defined FILL_GRAPH
+#if defined DO_GRADIENT
+    drawGradientLine(&sprite, thisX, tft.height() - graphFloorMargin, thisX, thisY,
+                     RGB565(220, 220, 255), rainGraphLineColor);
+
+    if (thisX - lastX > 1) {
+      drawGradientLine(&sprite, thisX - 1, tft.height() - graphFloorMargin,
+                       thisX - 1, lastY,
+                       RGB565(220, 220, 255), rainGraphLineColor);
+      drawGradientLine(&sprite, thisX - 1, tft.height() - graphFloorMargin,
+                       thisX - 1, thisY,
+                       RGB565(220, 220, 255), rainGraphLineColor);
+    }
+#else
     sprite.drawLine(thisX, tft.height() - graphFloorMargin, thisX, thisY,
                     rainGraphLineColor);
     if (thisX - lastX > 1) {
@@ -91,6 +104,7 @@ void graphTheRain()
     // Remember starting position for next line segment.
     lastX = thisX, lastY = thisY;
   }
+#endif
   // Decorations part 2
   sprite.setTextDatum(BR_DATUM);
   sprite.drawString(String(ceil(highRainForecast), 0),

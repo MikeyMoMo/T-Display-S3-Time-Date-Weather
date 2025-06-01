@@ -92,6 +92,18 @@ void graphTheSnow()
             (expandedData[i] * 100 * pixelsPerHundredthV);
     sprite.drawLine(lastX, lastY, thisX, thisY, snowGraphLineColor);
 #if defined FILL_GRAPH
+#if defined DO_GRADIENT
+    drawGradientLine(&sprite, thisX, tft.height() - graphFloorMargin, thisX, thisY,
+                     RGB565(25, 25, 25), snowGraphLineColor);
+    if (thisX - lastX > 1) {
+      drawGradientLine(&sprite, thisX - 1, tft.height() - graphFloorMargin,
+                       thisX - 1, lastY,
+                       RGB565(25, 25, 25), snowGraphLineColor);
+      drawGradientLine(&sprite, thisX - 1, tft.height() - graphFloorMargin,
+                       thisX - 1, thisY,
+                       RGB565(25, 25, 25), snowGraphLineColor);
+    }
+#else
     sprite.drawLine(thisX, tft.height() - graphFloorMargin, thisX, thisY,
                     snowGraphLineColor);
     if (thisX - lastX > 1) {
@@ -104,6 +116,7 @@ void graphTheSnow()
     // Remember starting position for next line segment.
     lastX = thisX, lastY = thisY;
   }
+#endif
   // Decorations part 2
   sprite.setTextDatum(BR_DATUM);
   sprite.drawString(String(ceil(highSnowForecast), 0),
