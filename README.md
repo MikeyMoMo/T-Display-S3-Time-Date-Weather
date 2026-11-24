@@ -1,5 +1,5 @@
 # T-Display-S3-Time-Date-Weather
-This code obtains WX from OWM and shows it in several ways, current and forecasted.
+This code obtains WX from OpenWeatherMap (OWM) and shows it in several ways, current and forecasted.
 
 Now available, gradient lines for the graphs.  It looks so much better to me.  I hope you enjoy it.  The code for gradient lines is in this project.  It is not available from tft_espi, only here.
 
