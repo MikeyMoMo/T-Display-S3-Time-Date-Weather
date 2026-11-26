@@ -343,7 +343,8 @@ void setup()
   //  iHomeOffset = (iHomeOffset / 100) * 3600 + iHomeOffset % 100 * 60;
   //  Serial.printf("Home offset %i\r\n", iHomeOffset);
 
-  setBrightness();  // Find the hour and set the display brightness.
+  setBrightness(false);  // Find the hour and set the display brightness.
+  // Serial.printf("4-Set brightness to %d\r\n", brightness);
   showCurrentCondx();
   time(&lastOn);              // Start the "screen on" timer now.
   displayStatus = displayOn;
@@ -393,8 +394,10 @@ void loop()
           // (i.e. its BLANK_SECS on-time has run out).
           if (lastOn + BLANK_SECS < testOn) {
             if (!screenOn) {
+              Serial.println("Turning display on via button press.");
               tft.writecommand(ST7789_DISPON);  // Turn on display hardware
               screenOn = true;
+              setBrightness(true);
             }
             // Turn the display on bigly for init messages.
             ledcWrite(TFT_BL, screensExtraBright);
@@ -406,8 +409,6 @@ void loop()
 
             ofr.setCursor(xCenter,  buttonLine1);
             ofr.cprintf("Time is: %s:%s", timeHour, timeMin);
-            // >>> REVIEW: "%02s" - the 0 flag is undefined for strings in C.
-            // >>>   timeHour/timeMin are already 2 digits, so use "%s:%s".
 
             ofr.setCursor(xCenter,  buttonLine2);
             ofr.cprintf("in %s", sTown.c_str());
@@ -428,7 +429,8 @@ void loop()
         forceDisplayOn = false;
       }
       time(&lastOn);  // Restart display the blank timer.
-      setBrightness();
+      setBrightness(true);
+      // Serial.printf("5-Set brightness to %d\r\n", brightness);
     }
   }
 
@@ -453,6 +455,7 @@ void loop()
       if (!screenOn) {
         tft.writecommand(ST7789_DISPON);  // Turn on display hardware
         screenOn = true;
+        setBrightness(true);
       }
       // Turn the display on bigly for init messages.
       ledcWrite(TFT_BL, screensExtraBright);
@@ -538,6 +541,7 @@ void loop()
       sprite.fillSprite(TFT_BLACK);
       sprite.pushSprite(0, 0);  // Effectively turns the display off.
       brightness = 0;
+      // Serial.printf("2-Set brightness to %d\r\n", brightness);
       ledcWrite(TFT_BL, 0);       // Turn the display off.
       tft.writecommand(ST7789_DISPOFF);  // Power off display hardware.
       screenOn = false;
@@ -552,8 +556,8 @@ void loop()
     // >>>   last screen drawn and only redraw when the screen changes (or
     // >>>   new data arrives).  Less CPU, less heat, smoother clock.
 
+    // Serial.printf("Curr Second %d\r\n", intSec);
     // Rotate the screens.
-    //    Serial.printf("Curr Second %d\r\n", intSec);
     if (intSec >  4 && intSec < 13) ShowForecast();  // 05-12
     if (intSec > 12 && intSec < 21) graphTheTemp();  // 13-20
     if (intSec > 20 && intSec < 29) graphTheRain();  // 21-28
@@ -597,65 +601,7 @@ void loop()
     //    showMemoryStats();
     uiNextFetchTime = millis() + uiFetchInterval;  // Remember when to fetch
   }
-  //=== G. Hourly brightness ===============================================
-  setBrightness();
-}
-/***************************************************************************/
-void setBrightness()
-/***************************************************************************/
-//  PURPOSE: Once per (home-city) hour, look up ihourlyBrilliance[hour] and
-//           apply it to the backlight.
-//  HOW:     Temporarily switch TZ to the home city (multiCity[0]), read the
-//           hour, then switch TZ back to the selected city.
-//
-//  >>> REVIEW (BUG - the brightness table is mostly ignored):
-//  >>>   ShowForecast, ShowSunMoon and all three graphs call
-//  >>>   ledcWrite(TFT_BL, screensExtraBright) = 200 every time they draw.
-//  >>>   So within ~5 s of the hour change your 80/100/160 value is replaced
-//  >>>   by 200, and it stays 200 until the next hour (showCurrentCondx
-//  >>>   doesn't reset it).  Night dimming therefore never really happens.
-//  >>>   Fix: in those screens use ledcWrite(TFT_BL, brightness), and keep
-//  >>>   screensExtraBright only for the white "message" screens.
-//  >>>
-//  >>>   Also: on an hour change while the screen is blanked, this turns the
-//  >>>   display hardware and backlight back on (showing black).  It
-//  >>>   coincides with the :00 auto-wake so you don't notice, but it should
-//  >>>   only touch the hardware if displayStatus == displayOn.
-//  >>>
-//  >>>   Also: this runs every loop pass (and does two setenv/tzset calls
-//  >>>   each time).  Cheap, but it could just compare the hour from a
-//  >>>   single localtime() using the home offset.
-/***************************************************************************/
-{
-  // By using setenv, DST is supported.  This routine finds the current hour
-  //  then sets the display brightness for that hour of home time.
-  //  For the purists among you, this can be seen as a little bit wasteful
-  //  for if the home city is selected, there is a setenv that are not
-  //  needed.  But this whole thing runs in less than 10ms so I did not
-  //  worry about that time loss each hour.  If I was writing an operating
-  //  system, I would worry about it.  For this application, nope!
-
-  // Change to home time.
-  time(&workTime);  // Get the local time epoch.
-  timeinfo = localtime(&workTime);  // Get correct local time including DST.
-  localHour = timeinfo->tm_hour;  // Get the home time hour.
-  if (prev_hour != localHour) {  // If hour changed, maybe new brightness.
-    prev_hour  = localHour;
-    brightness = ihourlyBrilliance[localHour];
-    Serial.printf("Setting screen brightness for hour %02i to %i\r\n",
-                  localHour, ihourlyBrilliance[localHour]);
-    if (!screenOn) {
-      tft.writecommand(ST7789_DISPON);  // Turn on display hardware
-      screenOn = true;
-    }
-    // Turn the display on bigly for init messages.
-    ledcWrite(TFT_BL, brightness);
-  }
-  // All is done here, go back to previous time zone (if needed).
-  if (whichCity != 0)  // 0 was set, above.  That may be redundant.
-    setenv("TZ", multiCity[whichCity].ENV.c_str(), 1); tzset();
-  // >>> NOTE: only setenv() is inside the if; tzset() always runs (that's
-  // >>>   fine, just be aware the one-line layout is misleading).  Use braces.
+  // Serial.printf("3-Exit Loop, brightness set to %d\r\n", brightness);
 }
 /***************************************************************************/
 void timeSyncCallback(struct timeval * tv)

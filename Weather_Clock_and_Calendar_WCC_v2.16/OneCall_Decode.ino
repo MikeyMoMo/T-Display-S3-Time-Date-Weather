@@ -92,17 +92,22 @@ void fetch_and_decode_OneCall()
     // >>>   most of it, but begin() on top of an un-ended begin() is asking for
     // >>>   a slow socket/memory leak.  Call http.end() before each retry and
     // >>>   once after getString().
-    // >>> NOTE: begin(url) with https and no certificate means the TLS link is
-    // >>>   NOT verified (encrypted, but anyone in the middle could pose as OWM
-    // >>>   and read your API key).  Low risk on a home network; fixable with
-    // >>>   WiFiClientSecure + setCACert().
+    //     >>> NOTE: begin(url) with https and no certificate means the TLS link is
+    //     >>>   NOT verified (encrypted, but anyone in the middle could pose as OWM
+    //     >>>   and read your API key).  Low risk on a home network; fixable with
+    //     >>>   WiFiClientSecure + setCACert().
+    // HTTPS connection used without certificate validation.
+
+    // MY NOTE: Intentional for this hobby project. Worst case is exposure
+    // of a free OpenWeatherMap API key. Certificate validation
+    // could be added later using WiFiClientSecure::setCACert().
     HTTPClient http;
     http.setTimeout(10000);
     while (httpCode != 200) {
-      Serial.print("\r\nOWM OneCall Request at ");
-      getMyTime(); Serial.print(fullTimeDate);
-      Serial.printf(" for %s.\r\n", multiCity[whichCity].CityName.c_str());
-      Serial.println(oneCallEndpoint);
+      //      Serial.print("\r\nOWM OneCall Request at ");
+      //      getMyTime(); Serial.print(fullTimeDate);
+      //      Serial.printf(" for %s.\r\n", multiCity[whichCity].CityName.c_str());
+      //      Serial.println(oneCallEndpoint);
       // >>> NOTE: this prints your API key to the Serial Monitor.  Be careful
       // >>>   when pasting logs/screenshots into forums or GitHub issues.
       // >>> NOTE: this rebuilds exactly the same URL as oneCallEndpoint above.
@@ -123,21 +128,16 @@ void fetch_and_decode_OneCall()
     //--- Got HTTP 200: read the whole reply and parse it --------------------
     JsonDocument doc;
     payload = http.getString();
-    Serial.println("OWM OneCall Return Packet");
-    Serial.println(payload);
-    // >>> REVIEW: dumps 15-20 KB of JSON to Serial on every fetch.  Put it
-    // >>>   inside #if defined DO_ONECALL_PRINTS like the other debug output.
+    http.end();
+
+    //    Serial.println("OWM OneCall Return Packet");
+    //    Serial.println(payload);
 
     DeserializationError error = deserializeJson(doc, payload);
     if (error) {
       Serial.print("OneCall deserializeJson() failed: ");
       Serial.println(error.c_str());
       return;
-      //      DeserializationError error = deserializeJson(doc, http.getStream());
-      //      if (error) {
-      //        Serial.print(F("deserializeJson() failed: ")); Serial.println(error.f_str());
-      //        http.end();
-      //        return;
     }
 
 #if defined DO_ONECALL_PRINTS
@@ -417,8 +417,8 @@ void fetch_and_decode_OneCall()
 #endif
     }
     //--- Done ----------------------------------------------------------------
-    Serial.print("OWM OneCall Complete at ");
-    printMyTime();
-    Serial.println("---------------------");
+    // Serial.print("OWM OneCall Complete at ");
+    // printMyTime();
+    // Serial.println("---------------------");
   }
 }

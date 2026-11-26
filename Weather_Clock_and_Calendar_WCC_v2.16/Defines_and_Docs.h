@@ -62,6 +62,7 @@ struct multiCityStruct {
   //                 DST from 2nd Sunday of March to 1st Sunday of November.
 };
 
+
 #if defined CONFIG_FOR_JOE
 //----------------------//
 const String api_key  = OWM_API_Joe;  // for joe
@@ -71,18 +72,19 @@ multiCityStruct multiCity[MAX_CITY] = {
 
   { "Bangui, RP",  // City
     //Latitude    Longitude      Units       POSIX ENV Time string
-    "18.5376",   "120.7671",    "metric",   "PHT-8"
+    "18.5376",   "120.7671",    "metric",   "PHT-8                                 "
   },
   { "Benicia, CA",
     "38.053926", "-122.155566", "imperial", "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00"
   },
   { "Cuyahoga Falls, OH",
-    "41.136394", "-81.484254",  "imperial", "EST5EDT,M3.2.0,M11.1.0"
+    "41.136394", "-81.484254",  "imperial", "EST5EDT,M3.2.0,M11.1.0                "
   },
   { "San Clemente, PH",
-    "15.7081",   "120.3692",    "imperial", "PHT-8"
+    "15.7081",   "120.3692",    "imperial", "PHT-8                                 "
   }
 };
+int homeCity = 1;
 
 const char* ntpServer1 = "pool.ntp.org";    // >>> Not actually used - see
 const char* ntpServer2 = "time.nist.gov";   // >>> configTime() in setup().
@@ -116,21 +118,22 @@ const String api_key = OWM_API_Mike;
 multiCityStruct multiCity[MAX_CITY] = {
   { "Bangui, RP",  // City
     //Latitude    Longitude      Units       POSIX ENV Time string
-    "18.5376",   "120.7671",    "metric",   "PHT-8"
+    "18.5376",   "120.7671",    "metric",   "PHT-8                                 "
   },
   { "Benicia, CA",
     "38.053926", "-122.155566", "imperial", "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00"
   },
   { "Dayton, OH",
-    "39.75895",  "-84.19161",   "imperial", "EST5EDT,M3.2.0,M11.1.0"
+    "39.75895",  "-84.19161",   "imperial", "EST5EDT,M3.2.0,M11.1.0                "
   },
   { "Shreveport, LA",
     "32.523659", "-93.763504",  "imperial", "CST6CDT,M3.2.0/2:00:00,M11.1.0/2:00:00"
   },
   { "San Clemente, PH",
-    "15.7081",   "120.3692",    "metric",   "PHT-8"
+    "15.7081",   "120.3692",    "metric",   "PHT-8                                 "
   },
 };
+int homeCity = 0;
 
 const char* ntpServer1 = "oceania.pool.ntp.org";   // >>> Not used either.
 const char* ntpServer2 = "time.nist.gov";

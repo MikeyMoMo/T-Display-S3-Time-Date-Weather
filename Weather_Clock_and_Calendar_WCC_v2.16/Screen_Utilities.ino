@@ -103,6 +103,7 @@ void getMyTime()
   // >>>     firstDay = ((dayInWeek - (dayInMonth - 1)) % 7 + 7) % 7;
   // >>>   (Even simpler: copy timeinfo, set tm_mday = 1, call mktime(), and
   // >>>   read tm_wday.)
+  // Calendar might be wrong here.  Claude's proposed solution, above.
   firstDay = dayInWeek + 1 - (dayInMonth % 7);  // Sunday = 0 here.
   // This uses Sunday as 0 as TimeLib does.  Others do not.
   // If the 19th is a Friday, then that's 6 (Friday is the 6th day) minus 1
@@ -250,6 +251,7 @@ void ShowForecast()
   char output[40];
   int yPos = 20;
   struct tm * now_tm;
+
 #define textCol 95
   // There are exactly 40 characters in font 2 across the screen.  Good luck!
   // Day Txx/yy 29 chars based on ID number.
@@ -305,11 +307,14 @@ void ShowForecast()
                         "%", textCol + txtW, yPos, 2);
     yPos += 22;
   }
-  sprite.pushSprite(0, 0);
   if (!screenOn) {
     tft.writecommand(ST7789_DISPON);  // Turn on display hardware
     screenOn = true;
+    setBrightness(true);
   }
+  // Serial.println("Pushing sprite");
+  sprite.pushSprite(0, 0);
+  // Serial.printf("Brightness %d\r\n", brightness);
   ledcWrite(TFT_BL, brightness);       // Turn the display on bigly for init messages.
 #if defined DO_FORECAST_PRINTS
   Serial.println("-------------------");
@@ -419,6 +424,7 @@ void ShowSunMoon()
   if (!screenOn) {
     tft.writecommand(ST7789_DISPON);  // Turn on display hardware
     screenOn = true;
+    setBrightness(true);
   }
   ledcWrite(TFT_BL, screensExtraBright);  // Turn the display on bigly for init messages.
 }
@@ -829,4 +835,65 @@ bool safeLoadFont(const char* fontName, const uint8_t* fontData,
     return false;  // failure
   }
   return true;  // success
+}
+/***************************************************************************/
+void setBrightness(bool forceTime)
+/***************************************************************************/
+//  PURPOSE: Once per (home-city) hour, look up ihourlyBrilliance[hour] and
+//           apply it to the backlight.
+//  HOW:     Temporarily switch TZ to the home city (multiCity[0]), read the
+//           hour, then switch TZ back to the selected city.
+//
+//  >>> REVIEW (BUG - the brightness table is mostly ignored):
+//  >>>   ShowForecast, ShowSunMoon and all three graphs call
+//  >>>   ledcWrite(TFT_BL, screensExtraBright) = 200 every time they draw.
+//  >>>   So within ~5 s of the hour change your 80/100/160 value is replaced
+//  >>>   by 200, and it stays 200 until the next hour (showCurrentCondx
+//  >>>   doesn't reset it).  Night dimming therefore never really happens.
+//  >>>   Fix: in those screens use ledcWrite(TFT_BL, brightness), and keep
+//  >>>   screensExtraBright only for the white "message" screens.
+//  >>>
+//  >>>   Also: on an hour change while the screen is blanked, this turns the
+//  >>>   display hardware and backlight back on (showing black).  It
+//  >>>   coincides with the :00 auto-wake so you don't notice, but it should
+//  >>>   only touch the hardware if displayStatus == displayOn.
+//  >>>
+//  >>>   Also: this runs every loop pass (and does two setenv/tzset calls
+//  >>>   each time).  Cheap, but it could just compare the hour from a
+//  >>>   single localtime() using the home offset.
+/***************************************************************************/
+{
+  // By using setenv, DST is supported.  This routine finds the current hour
+  //  then sets the display brightness for that hour of home time.
+  //  For the purists among you, this can be seen as a little bit wasteful
+  //  for if the home city is selected, there is a setenv that are not
+  //  needed.  But this whole thing runs in less than 10ms so I did not
+  //  worry about that time loss each hour.  If I was writing an operating
+  //  system, I would worry about it.  For this application, nope!
+
+  // Change to home time.
+  if (whichCity != homeCity) {
+    setenv("TZ", multiCity[homeCity].ENV.c_str(), 1); tzset();
+  }
+  time(&workTime);  // Get the local time epoch.
+  timeinfo = localtime(&workTime);  // Get correct local time including DST.
+  localHour = timeinfo->tm_hour;  // Get the home time hour.
+  if ((prev_hour != localHour) || forceTime) {  // If hour changed, maybe new brightness.
+    // Serial.printf("setBrightness() local hour %d\r\n", localHour);
+    prev_hour  = localHour;
+    // Serial.printf("Setting brightness to %d\r\n", ihourlyBrilliance[localHour]);
+    brightness = ihourlyBrilliance[localHour];
+    // Serial.printf("1-Set brightness to %d\r\n", brightness);
+    // Serial.printf("Setting screen brightness for hour %02i to %i\r\n",
+    //               localHour, ihourlyBrilliance[localHour]);
+    if (!screenOn) {
+      tft.writecommand(ST7789_DISPON);  // Turn on display hardware
+      screenOn = true;
+    }
+    ledcWrite(TFT_BL, brightness);
+  }
+  // All is done here, go back to previous time zone (if needed).
+  if (whichCity != homeCity) {  // Fix it back if changed.
+    setenv("TZ", multiCity[whichCity].ENV.c_str(), 1); tzset();
+  }
 }

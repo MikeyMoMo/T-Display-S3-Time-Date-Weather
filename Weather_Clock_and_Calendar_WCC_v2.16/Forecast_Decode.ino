@@ -62,6 +62,11 @@ void fetch_and_decode_Forecast()
     //--- Send the request; up to 4 tries, 10 s apart ------------------------
     // >>> REVIEW: same issues as OneCall: no http.end(), long blocking retries,
     // >>>   unverified TLS, API key printed to Serial.
+    // HTTPS connection used without certificate validation.
+
+    // MY NOTE: Intentional for this hobby project. Worst case is exposure
+    // of a free OpenWeatherMap API key. Certificate validation
+    // could be added later using WiFiClientSecure::setCACert().
     HTTPClient http;
     http.setTimeout(10000);
     while (httpCode != 200) {
@@ -79,8 +84,9 @@ void fetch_and_decode_Forecast()
       }
     }
     payload = http.getString();
-    Serial.println("OWM Forecast Return Packet");
-    Serial.println(payload);
+    http.end();
+    //    Serial.println("OWM Forecast Return Packet");
+    //    Serial.println(payload);
 
     DeserializationError error = deserializeJson(doc, payload);
     if (error) {
@@ -112,12 +118,12 @@ void fetch_and_decode_Forecast()
     // >>>   with negative counts - worth an early return when cnt < 2.
 
     if (ThreeHourSamples > forecastsLength) ThreeHourSamples = forecastsLength;
-    
+
     JsonArray list = doc["list"];
     JsonObject city = doc["city"];
     const char* cTown = city["name"];  // Echo back of the city name.
     sTown = String(cTown);
-    Serial.print("Report for "); Serial.println(sTown);
+    Serial.print("Fetch complete for "); Serial.println(sTown);
     city_timezone = city["timezone"];
     // Serial.printf("Time offset from UTC %i\r\n", city_timezone);
 #if defined DO_FORECAST_PRINTS

@@ -231,6 +231,7 @@ void graphTheSnow()
   if (!screenOn) {
     tft.writecommand(ST7789_DISPON);  // Turn on display hardware
     screenOn = true;
+    setBrightness(true);
   }
   ledcWrite(TFT_BL, screensExtraBright);  // Turn the display on bigly for init messages.
   sprite.pushSprite(0, 0);
