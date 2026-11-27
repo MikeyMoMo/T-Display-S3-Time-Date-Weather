@@ -104,7 +104,7 @@ void getMyTime()
   // >>>   (Even simpler: copy timeinfo, set tm_mday = 1, call mktime(), and
   // >>>   read tm_wday.)
   // Calendar might be wrong here.  Claude's proposed solution, above.
-  firstDay = dayInWeek + 1 - (dayInMonth % 7);  // Sunday = 0 here.
+  firstDay = ((dayInWeek - (dayInMonth - 1)) % 7 + 7) % 7;  // Sunday = 0 here.
   // This uses Sunday as 0 as TimeLib does.  Others do not.
   // If the 19th is a Friday, then that's 6 (Friday is the 6th day) minus 1
   // is 5 (19 mod 7) and that gives a 1 and that's Monday. (Sunday is 0)
